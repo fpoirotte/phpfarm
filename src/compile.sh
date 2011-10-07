@@ -16,7 +16,7 @@
 #
 # In case the options in options.sh do not suit you or you just need
 # different options for different php versions, you may create
-# custom-options-$version.sh scripts that define a $configoptions
+# custom/options-$version.sh scripts that define a $configoptions
 # variable. See options.sh for more details.
 #
 # Put pyrus.phar into bzips/ to automatically get version-specific
@@ -39,7 +39,7 @@ for arg; do
 done
 
 if [ $# -eq 0 ]; then
-    default_versions="$basedir/default-versions.txt"
+    default_versions="$basedir/custom/default-versions.txt"
     if [ -f "$default_versions" -o -L "$default_versions" ]; then
         while read arg; do
             if [ "x$arg" != "x" -a "${arg:0:1}" != "#" ]; then
@@ -50,7 +50,7 @@ if [ $# -eq 0 ]; then
 fi
 
 if [ ${#versions[@]} -eq 0 ]; then
-    echo 'Please specify php version or create "default-versions.txt" file'
+    echo 'Please specify php version or create "custom/default-versions.txt" file'
     exit 1
 fi
 
@@ -172,12 +172,12 @@ for version in "${versions[@]}"; do
     cd "$basedir"
     if [ -f "$initarget" ]; then
         #fixme: make the options unique or so
-        custom="custom-php.ini"
+        custom="custom/php.ini"
         [ ! -f $custom -a ! -L $custom ] && cp "default-custom-php.ini" "$custom"
 
         ext_dir=`"$instdir/bin/pear" config-get ext_dir system`
         for suffix in "" "-$vmajor" "-$vmajor.$vminor" "-$vmajor.$vminor.$vpatch"; do
-            custom="custom-php$suffix.ini"
+            custom="custom/php$suffix.ini"
             [ -f $custom -o -L $custom ] && sed -e 's#$ext_dir#'"$ext_dir"'#' "$custom" >> "$initarget"
         done
     fi
@@ -229,7 +229,7 @@ for version in "${versions[@]}"; do
 
     # Post-install stuff
     for suffix in "" "-$vmajor" "-$vmajor.$vminor" "-$vmajor.$vminor.$vpatch"; do
-        post="./post-install$suffix.sh"
+        post="custom/post-install$suffix.sh"
         [ -f $post -o -L $post ] && /bin/bash "$post" "$version" "$instdir" "$shbindir"
     done
 done

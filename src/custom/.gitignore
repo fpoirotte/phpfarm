@@ -1,0 +1,4 @@
+options*.sh
+php*.ini
+default-versions.txt
+post-install*.sh

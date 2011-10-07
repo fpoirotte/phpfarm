@@ -29,10 +29,10 @@ Configure options customization
 Default configuration options are in ``src/options.sh``.
 You may create version-specific custom option files:
 
-- ``custom-options.sh``
-- ``custom-options-5.sh``
-- ``custom-options-5.3.sh``
-- ``custom-options-5.3.1.sh``
+- ``custom/options.sh``
+- ``custom/options-5.sh``
+- ``custom/options-5.3.sh``
+- ``custom/options-5.3.1.sh``
 
 The shell script needs to define a variable "``$configoptions``" with
 all ``./configure`` options.
@@ -43,10 +43,10 @@ php.ini customization
 ---------------------
 ``php.ini`` values may also be customized:
 
-- ``custom-php.ini``
-- ``custom-php-5.ini``
-- ``custom-php-5.3.ini``
-- ``custom-php-5.3.1.ini``
+- ``custom/php.ini``
+- ``custom/php-5.ini``
+- ``custom/php-5.3.ini``
+- ``custom/php-5.3.1.ini``
 
 Please note that a few substitutions are done in those files in order
 to generate the final php.ini configuration file. Namely, the following
@@ -65,10 +65,10 @@ Post-install customization
 You may also create version-specific scripts that will be run after
 the PHP binary has been successfully compiled, installed and configured:
 
-- ``post-install.sh``
-- ``post-install-5.sh``
-- ``post-install-5.3.sh``
-- ``post-install-5.3.1.sh``
+- ``custom/post-install.sh``
+- ``custom/post-install-5.sh``
+- ``custom/post-install-5.3.sh``
+- ``custom/post-install-5.3.1.sh``
 
 These scripts can be used for example to discover PEAR channels
 and pre-install some extensions/packages needed by your project.
@@ -81,10 +81,11 @@ by passing the name of each version to ``compile.sh``::
 
     ``./compile.sh  5.3.1  5.4.0beta1``
 
-You may also create a file called ``default-versions.txt`` which contains
-the names of the versions (one per line) you want installed by default.
-Empty lines are ignored in this file. Lines starting with a hash (#) are
-treated as comments and also ignored.
+You may also create a file called ``custom/default-versions.txt``
+which contains the names of the versions (one per line) you want
+installed by default.
+Empty lines are ignored in this file. Lines starting with a hash (#)
+are treated as comments and also ignored.
 This file will be used by ``./compile.sh`` when it's called without any
 argument and is mostly useful when you often need to recompile the same
 versions of PHP (eg. as part of a Continuous Integration process).
@@ -102,8 +103,8 @@ It generally looks somewhat like this::
     5.3.1-prod
 
 
-Known issues
-------------
+Caveats
+-------
 The following entries are known issues which may or may not be solved
 in the future:
 
