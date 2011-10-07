@@ -1,3 +1,5 @@
 php-*/
 bzips/*.bz2
 bzips/*.phar
+custom/*
+custom
