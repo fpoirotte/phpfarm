@@ -157,9 +157,10 @@ if [ -f "$initarget" ]; then
     custom="custom-php.ini"
     [ ! -f $custom -a ! -L $custom ] && cp "default-custom-php.ini" "$custom"
 
+    ext_dir=`"$instdir/bin/pear" config-get ext_dir system`
     for suffix in "" "-$vmajor" "-$vmajor.$vminor" "-$vmajor.$vminor.$vpatch"; do
         custom="custom-php$suffix.ini"
-        [ -f $custom -o -L $custom ] && cat "$custom" >> "$initarget"
+        [ -f $custom -o -L $custom ] && sed -e 's#$ext_dir#'"$ext_dir"'#' "$custom" >> "$initarget"
     done
 fi
 

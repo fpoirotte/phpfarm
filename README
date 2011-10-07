@@ -24,8 +24,8 @@ Setup
   ``PATH="$PATH:$HOME/phpfarm/inst/bin"`` in ``.bashrc``
 
 
-Customization
--------------
+Configure options customization
+-------------------------------
 Default configuration options are in ``src/options.sh``.
 You may create version-specific custom option files:
 
@@ -38,9 +38,24 @@ The shell script needs to define a variable "``$configoptions``" with
 all ``./configure`` options.
 Do not try to change ``prefix`` and ``exec-prefix``.
 
+
+php.ini customization
+---------------------
 ``php.ini`` values may also be customized:
 
 - ``custom-php.ini``
 - ``custom-php-5.ini``
 - ``custom-php-5.3.ini``
 - ``custom-php-5.3.1.ini``
+
+Please note that a few substitutions are done in those files in order
+to generate the final php.ini configuration file. Namely, the following
+variables are substitued:
+
+- ``$ext_dir`` gets replaced by the path to the extension directory
+  This is mostly used to set the ``extension_dir`` option to the right
+  value. 
+  This is also useful when installing a ``zend_extension`` like
+  Xdebug as ``extension_dir`` is not automatically prepended to the
+  path for those extensions.
+
