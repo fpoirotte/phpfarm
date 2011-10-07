@@ -74,6 +74,14 @@ These scripts can be used for example to discover PEAR channels
 and pre-install some extensions/packages needed by your project.
 
 
+Bonus features
+--------------
+You may actually compile and install several versions of PHP in turn
+by passing the name of each version to ``compile.sh``::
+
+    ``./compile.sh  5.3.1  5.4.0beta1``
+
+
 Known issues
 ------------
 The following entries are known issues which may or may not be solved
