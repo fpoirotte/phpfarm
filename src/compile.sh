@@ -217,7 +217,7 @@ for version in "${versions[@]}"; do
     ln -fs "$instdir/bin/php-config" "$shbindir/php-config-$version"
     ln -fs "$instdir/bin/phpize" "$shbindir/phpize-$version"
     # If PEAR was installed, finish the setup here.
-    if [ -f "$shbindir/pear-$version" -o -L "$shbindir/pear-$version" ]; then
+    if [ -f "$instdir/bin/pear" -o -L "$instdir/bin/pear" ]; then
         ln -fs "$instdir/bin/pear" "$shbindir/pear-$version"
         ln -fs "$instdir/bin/peardev" "$shbindir/peardev-$version"
         ln -fs "$instdir/bin/pecl" "$shbindir/pecl-$version"
