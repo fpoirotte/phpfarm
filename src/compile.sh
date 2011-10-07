@@ -30,7 +30,6 @@ vmajor=`echo ${version%%.*}`
 vminor=`echo ${version%.*}`
 vminor=`echo ${vminor#*.}`
 vpatch=`echo ${version##*.}`
-vcomp=`printf "%02d%02d%02d\n" $vmajor $vminor $vpatch`
 
 #directory of this file. all php srces are extrated in it
 basedir="`dirname "$0"`"
