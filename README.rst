@@ -79,7 +79,7 @@ Bonus features
 You may actually compile and install several versions of PHP in turn
 by passing the name of each version to ``compile.sh``::
 
-    ``./compile.sh  5.3.1  5.4.0beta1``
+    ./compile.sh  5.3.1  5.4.0beta1
 
 You may also create a file called ``custom/default-versions.txt``
 which contains the names of the versions (one per line) you want
