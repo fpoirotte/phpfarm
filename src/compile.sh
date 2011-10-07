@@ -207,3 +207,9 @@ fi
 
 cd "$basedir"
 ./pyrus.sh "$version" "$instdir"
+
+# Post-install stuff
+for suffix in "" "-$vmajor" "-$vmajor.$vminor" "-$vmajor.$vminor.$vpatch"; do
+    post="./post-install$suffix.sh"
+    [ -f $post -o -L $post ] && /bin/bash "$post" "$version" "$instdir" "$shbindir"
+done

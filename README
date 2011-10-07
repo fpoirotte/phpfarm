@@ -60,6 +60,20 @@ variables are substitued:
   path for those extensions.
 
 
+Post-install customization
+--------------------------
+You may also create version-specific scripts that will be run after
+the PHP binary has been successfully compiled, installed and configured:
+
+- ``post-install.sh``
+- ``post-install-5.sh``
+- ``post-install-5.3.sh``
+- ``post-install-5.3.1.sh``
+
+These scripts can be used for example to discover PEAR channels
+and pre-install some extensions/packages needed by your project.
+
+
 Known issues
 ------------
 The following entries are known issues which may or may not be solved
