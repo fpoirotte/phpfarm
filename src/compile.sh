@@ -25,7 +25,7 @@
 # Author: Christian Weiske <cweiske@php.net>
 #
 
-#directory of this file. all php srces are extrated in it
+#directory of this file. all php sources are extracted in it
 basedir="`dirname "$0"`"
 cd "$basedir"
 basedir=`pwd`
