@@ -81,6 +81,26 @@ by passing the name of each version to ``compile.sh``::
 
     ``./compile.sh  5.3.1  5.4.0beta1``
 
+You may also create a file called ``default-versions.txt`` which contains
+the names of the versions (one per line) you want installed by default.
+Empty lines are ignored in this file. Lines starting with a hash (#) are
+treated as comments and also ignored.
+This file will be used by ``./compile.sh`` when it's called without any
+argument and is mostly useful when you often need to recompile the same
+versions of PHP (eg. as part of a Continuous Integration process).
+It generally looks somewhat like this::
+
+    # Generic version used for dev.
+    5.3.1
+
+    # Beta version used to test for regressions
+    # and to report bugs to the PHP folks.
+    5.4.0beta1
+
+    # Custom version which installs specific extensions/packages
+    # required for production during the post-install step.
+    5.3.1-prod
+
 
 Known issues
 ------------

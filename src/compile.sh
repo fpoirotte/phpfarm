@@ -38,8 +38,19 @@ for arg; do
     fi
 done
 
+if [ $# -eq 0 ]; then
+    default_versions="$basedir/default-versions.txt"
+    if [ -f "$default_versions" -o -L "$default_versions" ]; then
+        while read arg; do
+            if [ "x$arg" != "x" -a "${arg:0:1}" != "#" ]; then
+                versions[${#versions[@]}]="$arg"
+            fi
+        done < "$default_versions"
+    fi
+fi
+
 if [ ${#versions[@]} -eq 0 ]; then
-    echo 'Please specify php version'
+    echo 'Please specify php version or create "default-versions.txt" file'
     exit 1
 fi
 
