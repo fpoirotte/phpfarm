@@ -33,11 +33,7 @@ $gcov"
 
 echo $version $vmajor $vminor $vpatch
 
-custom="custom-options.sh"
-[ -f $custom ] && source "$custom" $version $vmajor $vminor $vpatch
-custom="custom-options-$vmajor.sh"
-[ -f $custom ] && source "$custom" $version $vmajor $vminor $vpatch
-custom="custom-options-$vmajor.$vminor.sh"
-[ -f $custom ] && source "$custom" $version $vmajor $vminor $vpatch
-custom="custom-options-$vmajor.$vminor.$vpatch.sh"
-[ -f $custom ] && source "$custom" $version $vmajor $vminor $vpatch
+for suffix in "" "-$vmajor" "-$vmajor.$vminor" "-$vmajor.$vminor.$vpatch"; do
+    custom="custom-options$suffix.sh"
+    [ -f $custom -o -L $custom ] && source "$custom" $version $vmajor $vminor $vpatch
+done

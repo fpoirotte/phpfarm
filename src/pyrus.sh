@@ -23,12 +23,12 @@ cd "$pwd"
 
 pyrusphar="$basedir/bzips/pyrus.phar"
 pyrustarget="$instdir/pyrus.phar"
-if [ ! -f "$pyrusphar" ]; then
+if [ ! -f "$pyrusphar" -a ! -L "$pyrusphar" ]; then
     #download pyrus from svn
     wget -O "$pyrusphar"\
         "http://pear2.php.net/pyrus.phar"
 fi
-if [ ! -f "$pyrusphar" ]; then
+if [ ! -f "$pyrusphar" -a ! -L "$pyrusphar" ]; then
     echo "Please put pyrus.phar into bzips/"
     exit 3
 fi

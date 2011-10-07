@@ -57,7 +57,7 @@ fi
 if [ ! -d "$srcdir" ]; then
     echo 'Source directory does not exist; trying to extract'
     srcfile="$bzipsdir/php-$version.tar.bz2"
-    if [ ! -f "$srcfile" ]; then
+    if [ ! -f "$srcfile" -a ! -L "$srcfile" ]; then
         echo 'Source file not found:'
         echo "$srcfile"
         url="http://museum.php.net/php$vmajor/php-$version.tar.bz2"
@@ -149,19 +149,18 @@ else
     echo "No php.ini file found."
     echo "Please copy it manually to $instdir/lib/php.ini"
 fi
+
 #set default ini values
 cd "$basedir"
 if [ -f "$initarget" ]; then
     #fixme: make the options unique or so
     custom="custom-php.ini"
-    [ ! -f $custom ] && cp "default-custom-php.ini" "$custom"
-    [ -f $custom ] && cat "$custom" >> "$initarget"
-    custom="custom-php-$vmajor.ini"
-    [ -f $custom ] && cat "$custom" >> "$initarget"
-    custom="custom-php-$vmajor.$vminor.ini"
-    [ -f $custom ] && cat "$custom" >> "$initarget"
-    custom="custom-php-$vmajor.$vminor.$vpatch.ini"
-    [ -f $custom ] && cat "$custom" >> "$initarget"
+    [ ! -f $custom -a ! -L $custom ] && cp "default-custom-php.ini" "$custom"
+
+    for suffix in "" "-$vmajor" "-$vmajor.$vminor" "-$vmajor.$vminor.$vpatch"; do
+        custom="custom-php$suffix.ini"
+        [ -f $custom -o -L $custom ] && cat "$custom" >> "$initarget"
+    done
 fi
 
 #create bin
