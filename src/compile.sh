@@ -114,7 +114,7 @@ cd "$srcdir"
  --exec-prefix="$instdir" \
  --enable-debug \
  --disable-short-tags \
- --without-pear \
+ --with-pear="$instdir/pear" \
  $configoptions
 
 if [ $? -gt 0 ]; then
@@ -197,6 +197,13 @@ fi
 
 ln -fs "$instdir/bin/php-config" "$shbindir/php-config-$version"
 ln -fs "$instdir/bin/phpize" "$shbindir/phpize-$version"
+# If PEAR was installed, finish the setup here.
+if [ -f "$shbindir/pear-$version" -o -L "$shbindir/pear-$version" ]; then
+    ln -fs "$instdir/bin/pear" "$shbindir/pear-$version"
+    ln -fs "$instdir/bin/peardev" "$shbindir/peardev-$version"
+    ln -fs "$instdir/bin/pecl" "$shbindir/pecl-$version"
+    "$instdir/bin/pear" config-set php_dir "$instdir/pear/php" system
+fi
 
 cd "$basedir"
 ./pyrus.sh "$version" "$instdir"

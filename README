@@ -9,7 +9,7 @@ The PHP source packages are fetched from ``museum.php.net`` (which is not
 always up-to-date), the official php.net download pages and the
 pre-release channels.
 If a file cannot be found, try to fetch it manually and put it into
-``src/bzips/``
+``src/bzips/``.
 
 
 Setup
@@ -59,3 +59,17 @@ variables are substitued:
   Xdebug as ``extension_dir`` is not automatically prepended to the
   path for those extensions.
 
+
+Known issues
+------------
+The following entries are known issues which may or may not be solved
+in the future:
+
+- Do not use ``--enable-sigchld`` in your custom options if you plan
+  to install extensions using pear/pecl. When enabled, this option
+  will result in a failure during the ``phpize`` step (this issue
+  lies in PHP itself and is not specific to phpfarm).
+
+- By default, a (local) PEAR installation is created for every PHP version
+  you build. If you don't plan to use PEAR, you can prevent this from
+  happening by adding ``--without-pear`` to your ``$configoptions``.
