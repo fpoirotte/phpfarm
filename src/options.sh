@@ -17,6 +17,9 @@ vpatch=$4
 
 #gcov='--enable-gcov'
 configoptions="\
+--enable-debug \
+--disable-short-tags \
+--with-layout=GNU \
 --enable-bcmath \
 --enable-calendar \
 --enable-exif \

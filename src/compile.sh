@@ -124,18 +124,16 @@ for version in "${versions[@]}"; do
         tar xjvf "$srcfile"
     fi
 
-
+    #read customizations
     source 'options.sh' "$version" "$vmajor" "$vminor" "$vpatch"
     cd "$srcdir"
     #configuring
     #TODO: do not configure when config.nice exists
-    ./configure \
+   ./configure \
+     $configoptions \
      --prefix="$instdir" \
      --exec-prefix="$instdir" \
-     --enable-debug \
-     --disable-short-tags \
-     --with-pear="$instdir/pear" \
-     $configoptions
+     --with-pear="$instdir/pear"
 
     if [ $? -gt 0 ]; then
         echo configure.sh failed.
