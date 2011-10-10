@@ -127,25 +127,37 @@ for version in "${versions[@]}"; do
     #read customizations
     source 'options.sh' "$version" "$vmajor" "$vminor" "$vpatch"
     cd "$srcdir"
-    #configuring
-    #TODO: do not configure when config.nice exists
-   ./configure \
-     $configoptions \
-     --prefix="$instdir" \
-     --exec-prefix="$instdir" \
-     --with-pear="$instdir/pear"
 
-    if [ $? -gt 0 ]; then
-        echo configure.sh failed.
-        exit 3
+    #only configure/make during the first install of a new version
+    #or after some change occurred in customizations.
+    tstamp=0
+    if [ -f "config.nice" ]; then
+       tstamp=`stat -c '%Y' "config.nice"`
     fi
 
-    #compile sources
-    #make clean
-    make
-    if [ "$?" -gt 0 ]; then
-        echo make failed.
-        exit 4
+    if [ $configure -gt $tstamp ]; then
+        #configuring
+        echo "(Re-)configuring"
+        ./configure \
+         $configoptions \
+         --prefix="$instdir" \
+         --exec-prefix="$instdir" \
+         --with-pear="$instdir/pear"
+
+        if [ $? -gt 0 ]; then
+            echo configure.sh failed.
+            exit 3
+        fi
+    fi
+
+   if [ $configure -gt $tstamp -o ! -f sapi/cli/php ]; then
+        #compile sources
+        #make clean
+        make
+        if [ "$?" -gt 0 ]; then
+            echo make failed.
+            exit 4
+        fi
     fi
 
     make install

@@ -15,6 +15,7 @@ vmajor=$2
 vminor=$3
 vpatch=$4
 
+configure=0
 #gcov='--enable-gcov'
 configoptions="\
 --enable-debug \
@@ -39,5 +40,11 @@ echo $version $vmajor $vminor $vpatch
 
 for suffix in "" "-$vmajor" "-$vmajor.$vminor" "-$vmajor.$vminor.$vpatch"; do
     custom="custom/options$suffix.sh"
-    [ -f $custom -o -L $custom ] && source "$custom" $version $vmajor $vminor $vpatch
+    if [ -f $custom -o -L $custom ]; then
+        tstamp=`stat -c '%Y' "$custom"`
+        if [ $tstamp -gt $configure ]; then
+            configure=$tstamp
+        fi
+        source "$custom" $version $vmajor $vminor $vpatch
+    fi
 done
