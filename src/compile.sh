@@ -54,6 +54,13 @@ if [ ${#versions[@]} -eq 0 ]; then
     exit 1
 fi
 
+#directory with source archives
+bzipsdir='bzips'
+#directory phps get installed into
+instbasedir="`readlink -f "$basedir/../inst"`"
+#directory where all bins are symlinked
+shbindir="$instbasedir/bin"
+
 for version in "${versions[@]}"; do
     vmajor=`echo ${version%%.*}`
     vminor=`echo ${version%.*}`
@@ -62,14 +69,8 @@ for version in "${versions[@]}"; do
 
     #directory of php sources of specific version
     srcdir="php-$version"
-    #directory with source archives
-    bzipsdir='bzips'
-    #directory phps get installed into
-    instbasedir="`readlink -f "$basedir/../inst"`"
     #directory this specific version gets installed into
     instdir="$instbasedir/php-$version"
-    #directory where all bins are symlinked
-    shbindir="$instbasedir/bin"
 
     #already extracted?
     if [ ! -d "$srcdir" ]; then
