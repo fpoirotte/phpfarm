@@ -220,7 +220,6 @@ for version in "${versions[@]}"; do
         ln -fs "$instdir/bin/pear" "$shbindir/pear-$version"
         ln -fs "$instdir/bin/peardev" "$shbindir/peardev-$version"
         ln -fs "$instdir/bin/pecl" "$shbindir/pecl-$version"
-        "$instdir/bin/pear" config-set php_dir "$instdir/pear/php" system
     fi
 
     cd "$basedir"
