@@ -167,7 +167,7 @@ for version in "${versions[@]}"; do
     fi
 
     #copy php.ini
-    initarget="$instdir/lib/php.ini"
+    initarget="$instdir/etc/php.ini"
     if [ -f "php.ini-development" ]; then
         #php 5.3
         cp "php.ini-development" "$initarget"
@@ -176,7 +176,7 @@ for version in "${versions[@]}"; do
         cp "php.ini-recommended" "$initarget"
     else
         echo "No php.ini file found."
-        echo "Please copy it manually to $instdir/lib/php.ini"
+        echo "Please copy it manually to $instdir/etc/php.ini"
     fi
 
     #set default ini values
