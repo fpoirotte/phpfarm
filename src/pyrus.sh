@@ -34,6 +34,7 @@ if [ ! -f "$pyrusphar" -a ! -L "$pyrusphar" ]; then
 fi
 
 cp "$pyrusphar" "$pyrustarget"
+chmod +x "$pyrustarget"
 mkdir -p "$instdir/pear"
 
 pyrusbin="$instdir/bin/pyrus"
