@@ -227,11 +227,19 @@ for version in "${versions[@]}"; do
 
     ln -fs "$instdir/bin/php-config" "$shbindir/php-config-$version"
     ln -fs "$instdir/bin/phpize" "$shbindir/phpize-$version"
+
     # If PEAR was installed, finish the setup here.
     if [ -f "$instdir/bin/pear" -o -L "$instdir/bin/pear" ]; then
         ln -fs "$instdir/bin/pear" "$shbindir/pear-$version"
         ln -fs "$instdir/bin/peardev" "$shbindir/peardev-$version"
         ln -fs "$instdir/bin/pecl" "$shbindir/pecl-$version"
+    fi
+
+    # Recent versions of PHP come with a phar.phar archive
+    # that makes it easy to manipulate PHP archives.
+    # Let's be user-friendly and add a link to it if it exists.
+    if [ -f "$instdir/bin/phar.phar" -o -L "$instdir/bin/phar.phar" ]; then
+        ln -fs "$instdir/bin/phar.phar" "$shbindir/phar-$version"
     fi
 
     cd "$basedir"
