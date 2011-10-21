@@ -40,7 +40,7 @@ done
 
 if [ $# -eq 0 ]; then
     default_versions="$basedir/custom/default-versions.txt"
-    if [ -f "$default_versions" -o -L "$default_versions" ]; then
+    if [ -e "$default_versions" ]; then
         while read arg; do
             if [ "x$arg" != "x" -a "${arg:0:1}" != "#" ]; then
                 versions[${#versions[@]}]="$arg"
@@ -76,7 +76,7 @@ for version in "${versions[@]}"; do
     if [ ! -d "$srcdir" ]; then
         echo 'Source directory does not exist; trying to extract'
         srcfile="$bzipsdir/php-$version.tar.bz2"
-        if [ ! -f "$srcfile" -a ! -L "$srcfile" ]; then
+        if [ ! -e "$srcfile" ]; then
             echo 'Source file not found:'
             echo "$srcfile"
             url="http://museum.php.net/php$vmajor/php-$version.tar.bz2"
@@ -184,12 +184,12 @@ for version in "${versions[@]}"; do
     if [ -f "$initarget" ]; then
         #fixme: make the options unique or so
         custom="custom/php.ini"
-        [ ! -f $custom -a ! -L $custom ] && cp "default-custom-php.ini" "$custom"
+        [ ! -e "$custom" ] && cp "default-custom-php.ini" "$custom"
 
         ext_dir=`"$instdir/bin/php-config" --extension-dir`
         for suffix in "" "-$vmajor" "-$vmajor.$vminor" "-$vmajor.$vminor.$vpatch"; do
             custom="custom/php$suffix.ini"
-            [ -f $custom -o -L $custom ] && sed -e 's#$ext_dir#'"$ext_dir"'#' "$custom" >> "$initarget"
+            [ -e "$custom" ] && sed -e 's#$ext_dir#'"$ext_dir"'#' "$custom" >> "$initarget"
         done
     fi
 
@@ -229,7 +229,7 @@ for version in "${versions[@]}"; do
     ln -fs "$instdir/bin/phpize" "$shbindir/phpize-$version"
 
     # If PEAR was installed, finish the setup here.
-    if [ -f "$instdir/bin/pear" -o -L "$instdir/bin/pear" ]; then
+    if [ -e "$instdir/bin/pear" ]; then
         ln -fs "$instdir/bin/pear" "$shbindir/pear-$version"
         ln -fs "$instdir/bin/peardev" "$shbindir/peardev-$version"
         ln -fs "$instdir/bin/pecl" "$shbindir/pecl-$version"
@@ -238,7 +238,7 @@ for version in "${versions[@]}"; do
     # Recent versions of PHP come with a phar.phar archive
     # that makes it easy to manipulate PHP archives.
     # Let's be user-friendly and add a link to it if it exists.
-    if [ -f "$instdir/bin/phar.phar" -o -L "$instdir/bin/phar.phar" ]; then
+    if [ -e "$instdir/bin/phar.phar" ]; then
         ln -fs "$instdir/bin/phar.phar" "$shbindir/phar-$version"
     fi
 
@@ -248,7 +248,7 @@ for version in "${versions[@]}"; do
     # Post-install stuff
     for suffix in "" "-$vmajor" "-$vmajor.$vminor" "-$vmajor.$vminor.$vpatch"; do
         post="custom/post-install$suffix.sh"
-        [ -f $post -o -L $post ] && /bin/bash "$post" "$version" "$instdir" "$shbindir"
+        [ -e "$post" ] && /bin/bash "$post" "$version" "$instdir" "$shbindir"
     done
 done
 exit 0

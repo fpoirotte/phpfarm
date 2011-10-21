@@ -40,7 +40,7 @@ echo $version $vmajor $vminor $vpatch
 
 for suffix in "" "-$vmajor" "-$vmajor.$vminor" "-$vmajor.$vminor.$vpatch"; do
     custom="custom/options$suffix.sh"
-    if [ -f $custom -o -L $custom ]; then
+    if [ -e "$custom" ]; then
         tstamp=`stat -c '%Y' "$custom"`
         if [ $tstamp -gt $configure ]; then
             configure=$tstamp
