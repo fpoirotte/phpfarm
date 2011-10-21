@@ -17,7 +17,7 @@ Setup
 - Check out phpfarm from git:
   ``git clone git://git.code.sf.net/p/phpfarm/code phpfarm``
 - ``cd phpfarm/src/``
-- ``./compile.sh 5.3.0``
+- ``./main.sh 5.3.0``
 - PHP gets installed into ``phpfarm/inst/php-$version/``
 - ``phpfarm/inst/bin/php-$version`` is also executable
   You should add ``inst/bin`` to your ``$PATH``, i.e.
@@ -54,7 +54,7 @@ variables are substitued:
 
 - ``$ext_dir`` gets replaced by the path to the extension directory
   This is mostly used to set the ``extension_dir`` option to the right
-  value. 
+  value.
   This is also useful when installing a ``zend_extension`` like
   Xdebug as ``extension_dir`` is not automatically prepended to the
   path for those extensions.
@@ -77,16 +77,16 @@ and pre-install some extensions/packages needed by your project.
 Bonus features
 --------------
 You may actually compile and install several versions of PHP in turn
-by passing the name of each version to ``compile.sh``::
+by passing the name of each version to ``main.sh``::
 
-    ./compile.sh  5.3.1  5.4.0beta1
+    ./main.sh  5.3.1  5.4.0beta1
 
 You may also create a file called ``custom/default-versions.txt``
 which contains the names of the versions (one per line) you want
 installed by default.
 Empty lines are ignored in this file. Lines starting with a hash (#)
 are treated as comments and also ignored.
-This file will be used by ``./compile.sh`` when it's called without any
+This file will be used by ``./main.sh`` when it's called without any
 argument and is mostly useful when you often need to recompile the same
 versions of PHP (eg. as part of a Continuous Integration process).
 It generally looks somewhat like this::
@@ -116,3 +116,4 @@ in the future:
 - By default, a (local) PEAR installation is created for every PHP version
   you build. If you don't plan to use PEAR, you can prevent this from
   happening by adding ``--without-pear`` to your ``$configoptions``.
+
