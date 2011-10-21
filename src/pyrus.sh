@@ -9,11 +9,20 @@ if [ $# -lt 2 ] ; then
 fi
 
 version="$1"
+vmajor=`echo ${version%%.*}`
+vminor=`echo ${version%.*}`
+vminor=`echo ${vminor#*.}`
 instdir="$2"
 
 if [ ! -d "$instdir" ]; then
     echo "PHP installation directory does not exist: $instdir"
     exit 2
+fi
+
+test $vmajor -gt 5 -o \( $vmajor -eq 5 -a $vminor -ge 3 \)
+if [ $? -ne 0 ]; then
+    echo "Skipping Pyrus installation for PHP < 5.3.0"
+    exit 0
 fi
 
 pwd=`pwd`
@@ -47,3 +56,4 @@ chmod +x "$pyrusbin"
 ln -sf "$pyrusbin" "$instdir/../bin/pyrus-$version"
 
 echo "include_path=\".:$instdir/pear/\"" >> "$instdir/etc/php.ini"
+exit 0
