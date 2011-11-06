@@ -130,6 +130,31 @@ if [ $configure -gt $tstamp ]; then
     fi
 fi
 
+
+# Check that no unknown options have been used.
+unknown_options=
+if [ -e "config.status" ]; then
+    unknown_options=`sed -ne '/Following unknown configure options were used/,/for available options/p' config.status | sed -n -e '$d' -e '/^$/d' -e '3,$p'`
+fi
+# PHP 5.4 uses a different way to report such problems.
+if [ -z "$unknown_options" -a -e "config.log" ]; then
+    unknown_options=`sed -n -r -e 's/configure:[^\020]+WARNING: unrecognized options: //p' config.log`
+fi
+
+if [ -n "$unknown_options" ]; then
+    # If the error comes from a previous run, ./configure won't kick in and
+    # it won't display the error message. We do the work in its place here.
+    if [ $configure -le $tstamp ]; then
+        echo "ERROR: The following unrecognized configure options were used:"
+        echo ""
+        echo $unknown_options
+        echo ""
+        echo "Check 'configure --help' for available options."
+    fi
+    echo "Please fix your configure options and try again."
+    exit 3
+fi
+
 if [ $configure -gt $tstamp -o ! -f sapi/cli/php ]; then
     #compile sources
     #make clean
@@ -240,4 +265,4 @@ for suffix in "" "-$vmajor" "-$vmajor.$vminor" "-$vmajor.$vminor.$vpatch"; do
     post="custom/post-install$suffix.sh"
     [ -e "$post" ] && /bin/bash "$post" "$version" "$instdir" "$shbindir"
 done
-
+exit 0

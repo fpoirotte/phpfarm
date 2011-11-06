@@ -64,6 +64,11 @@ PHPFARM_MAIN_VERSION="$main_version"
 export PHPFARM_MAIN_VERSION
 for version in "${versions[@]}"; do
     ./compile.sh "$version"
+    res=$?
+    if [ $res -ne 0 ]; then
+        echo "An error occurred while trying to install PHP $version."
+        exit $res
+    fi
 done
 exit 0
 
