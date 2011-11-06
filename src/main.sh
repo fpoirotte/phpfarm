@@ -37,12 +37,18 @@ for arg; do
     fi
 done
 
+main_version=
 if [ $# -eq 0 ]; then
     default_versions="$basedir/custom/default-versions.txt"
     if [ -e "$default_versions" ]; then
         while read arg; do
             if [ "x$arg" != "x" -a "${arg:0:1}" != "#" ]; then
                 versions[${#versions[@]}]="$arg"
+
+                # The first entry in this file is the main version.
+                if [ -z "$main_version" ]; then
+                    main_version="$arg"
+                fi
             fi
         done < "$default_versions"
     fi
@@ -53,6 +59,9 @@ if [ ${#versions[@]} -eq 0 ]; then
     exit 1
 fi
 
+# Export information about the main version to subprocesses.
+PHPFARM_MAIN_VERSION="$main_version"
+export PHPFARM_MAIN_VERSION
 for version in "${versions[@]}"; do
     ./compile.sh "$version"
 done

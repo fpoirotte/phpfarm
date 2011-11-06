@@ -55,5 +55,11 @@ chmod +x "$pyrusbin"
 #symlink
 ln -sf "$pyrusbin" "$instdir/../bin/pyrus-$version"
 
+# Use as main version if necessary.
+if [ "$version" = "$PHPFARM_MAIN_VERSION" ]; then
+    echo "Marking pyrus-$version as the main version of pyrus."
+    ln -sf "$instdir/../bin/pyrus-$version" "$instdir/../bin/pyrus"
+fi
+
 echo "include_path=\".:$instdir/pear/\"" >> "$instdir/etc/php.ini"
 exit 0

@@ -102,6 +102,13 @@ It generally looks somewhat like this::
     # required for production during the post-install step.
     5.3.1-prod
 
+Last but now least, when using a ``custom/default-versions.txt`` file,
+the first version in this file will be marked as your "main version",
+creating links to this version's tools without any suffix.
+So, if phpfarm's ``inst/bin`` directory is in your ``$PATH`` and there
+is no ``php`` executable installed globally on your system, calling
+``php`` will actually execute your main version's ``php``.
+
 
 Caveats
 -------
