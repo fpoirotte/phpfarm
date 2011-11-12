@@ -59,9 +59,6 @@ if [ ${#versions[@]} -eq 0 ]; then
     exit 1
 fi
 
-# Export information about the main version to subprocesses.
-PHPFARM_MAIN_VERSION="$main_version"
-export PHPFARM_MAIN_VERSION
 for version in "${versions[@]}"; do
     ./compile.sh "$version"
     res=$?
@@ -70,5 +67,16 @@ for version in "${versions[@]}"; do
         exit $res
     fi
 done
+
+# Set the main version.
+if [ -n "$main_version" ]; then
+    echo "Setting $main_version as your main PHP version"
+    #directory phps get installed into
+    instbasedir="`readlink -f "$basedir/../inst"`"
+    #directory this specific version was installed into
+    instdir="$instbasedir/php-$version"
+    ln -sf "$instbasedir/php-$version/bin" "$instbasedir/main"
+fi
+
 exit 0
 

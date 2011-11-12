@@ -247,16 +247,6 @@ if [ -e "$instdir/bin/phar.phar" ]; then
     ln -fs "$instdir/bin/phar.phar" "$shbindir/phar-$version"
 fi
 
-# Use as main version if necessary.
-if [ "$version" = "$PHPFARM_MAIN_VERSION" ]; then
-    for prog in php php-cgi php-config phpize pear peardev pecl phar; do
-        if [ -e "$shbindir/${prog}-$version" ]; then
-            echo "Marking ${prog}-$version as the main version of $prog."
-            ln -fs "$shbindir/${prog}-$version" "$shbindir/$prog"
-        fi
-    done
-fi
-
 cd "$basedir"
 ./pyrus.sh "$version" "$instdir"
 

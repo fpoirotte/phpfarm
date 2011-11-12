@@ -20,8 +20,9 @@ Setup
 - ``./main.sh 5.3.0``
 - PHP gets installed into ``phpfarm/inst/php-$version/``
 - ``phpfarm/inst/bin/php-$version`` is also executable
-  You should add ``inst/bin`` to your ``$PATH``, i.e.
-  ``PATH="$PATH:$HOME/phpfarm/inst/bin"`` in ``.bashrc``
+  You should add ``inst/bin`` and ``inst/main`` to your ``$PATH``,
+  i.e. ``PATH="$PATH:$HOME/phpfarm/inst/bin:$HOME/phpfarm/inst/main"``
+  in ``.bashrc``
 
 
 Configure options customization
@@ -103,9 +104,8 @@ It generally looks somewhat like this::
     5.3.1-prod
 
 Last but now least, when using a ``custom/default-versions.txt`` file,
-the first version in this file will be marked as your "main version",
-creating links to this version's tools without any suffix.
-So, if phpfarm's ``inst/bin`` directory is in your ``$PATH`` and there
+the first version in this file will be marked as your "main version".
+So, if phpfarm's ``inst/main`` directory is in your ``$PATH`` and there
 is no ``php`` executable installed globally on your system, calling
 ``php`` will actually execute your main version's ``php``.
 
