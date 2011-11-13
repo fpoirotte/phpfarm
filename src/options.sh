@@ -16,9 +16,7 @@ vminor=$3
 vpatch=$4
 
 configure=0
-#gcov='--enable-gcov'
 configoptions="\
---enable-debug \
 --disable-short-tags \
 --with-layout=GNU \
 --enable-bcmath \
@@ -33,8 +31,7 @@ configoptions="\
 --enable-wddx \
 --enable-zip \
 --with-zlib \
---with-gettext \
-$gcov"
+--with-gettext"
 
 echo $version $vmajor $vminor $vpatch
 

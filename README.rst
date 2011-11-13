@@ -75,6 +75,30 @@ These scripts can be used for example to discover PEAR channels
 and pre-install some extensions/packages needed by your project.
 
 
+Special tokens in version strings
+---------------------------------
+
+phpfarm recognizes a few special tokens in the version string.
+These tokens must be appended to the version string and separated
+from it and from one another by dashes (-).
+
+The following tokens are currently accepted:
+
+- ``debug`` to compile a version with debugging symbols.
+- ``zts`` to enable thread safety.
+- ``32bits`` to force the creation of a 32 bits version of PHP on a
+  64 bits machine.
+- ``gcov`` to enable GCOV code coverage information (requires LTP).
+
+For example, to build a thread-safe version of PHP 5.3.1 with debugging
+symboles, use::
+
+    ./main.sh  5.3.1-zts-debug
+
+**Note**: the order in which the tokens appear does not matter,
+phpfarm will reorganize them if needed. Hence, ``5.3.1-zts-debug``
+is effectively the same as ``5.3.1-debug-zts``.
+
 Bonus features
 --------------
 You may actually compile and install several versions of PHP in turn

@@ -25,47 +25,44 @@
 # Author: Christian Weiske <cweiske@php.net>
 #
 
-version=$1
-vmajor=`echo ${version%%.*}`
-vminor=`echo ${version%.*}`
-vminor=`echo ${vminor#*.}`
-vpatch=`echo ${version##*.}`
-
 #directory of this file. all php sources are extracted in it
 basedir="`dirname "$0"`"
 cd "$basedir"
 basedir=`pwd`
+
+#we need a php version
+source helpers.sh
+parse_version $1
+if [ $? -ne 0 ]; then
+    echo 'Please specify php version'
+    exit 1
+fi
+
 #directory of php sources of specific version
-srcdir="php-$version"
+srcdir="php-$VERSION"
 #directory with source archives
 bzipsdir='bzips'
 #directory phps get installed into
 instbasedir="`readlink -f "$basedir/../inst"`"
 #directory this specific version gets installed into
-instdir="$instbasedir/php-$version"
+instdir="$instbasedir/php-$VERSION"
 #directory where all bins are symlinked
 shbindir="$instbasedir/bin"
-
-#we need a php version
-if [ "x$version" = 'x' ]; then
-    echo 'Please specify php version'
-    exit 1
-fi
 
 #already extracted?
 if [ ! -d "$srcdir" ]; then
     echo 'Source directory does not exist; trying to extract'
-    srcfile="$bzipsdir/php-$version.tar.bz2"
+    srcfile="$bzipsdir/php-$SHORT_VERSION.tar.bz2"
     if [ ! -e "$srcfile" ]; then
         echo 'Source file not found:'
         echo "$srcfile"
-        url="http://museum.php.net/php$vmajor/php-$version.tar.bz2"
+        url="http://museum.php.net/php$VMAJOR/php-$SHORT_VERSION.tar.bz2"
         wget -P "$bzipsdir" "$url"
         if [ ! -f "$srcfile" ]; then
             echo "Fetching sources from museum failed"
             echo $url
             #museum failed, now we try real download
-            url="http://www.php.net/get/php-$version.tar.bz2/from/this/mirror"
+            url="http://www.php.net/get/php-$SHORT_VERSION.tar.bz2/from/this/mirror"
             wget -P "$bzipsdir" -O "$srcfile" "$url"
         fi
         if [ ! -s "$srcfile" -a -f "$srcfile" ]; then
@@ -76,7 +73,7 @@ if [ ! -d "$srcdir" ]; then
             echo "Fetching sources from official download site failed"
             echo $url
             #use ilia's RC (5.3.x)
-            url="https://downloads.php.net/ilia/php-$version.tar.bz2"
+            url="https://downloads.php.net/ilia/php-$SHORT_VERSION.tar.bz2"
             wget -P "$bzipsdir" -O "$srcfile" "$url"
         fi
         if [ ! -s "$srcfile" -a -f "$srcfile" ]; then
@@ -87,7 +84,7 @@ if [ ! -d "$srcdir" ]; then
             echo "Fetching sources from ilia's site failed"
             echo $url
             #use stas's RC (5.4.x)
-            url="https://downloads.php.net/stas/php-$version.tar.bz2"
+            url="https://downloads.php.net/stas/php-$SHORT_VERSION.tar.bz2"
             wget -P "$bzipsdir" -O "$srcfile" "$url"
         fi
         if [ ! -s "$srcfile" -a -f "$srcfile" ]; then
@@ -101,11 +98,11 @@ if [ ! -d "$srcdir" ]; then
         fi
     fi
     #extract
-    tar xjvf "$srcfile"
+    tar xjvf "$srcfile" --show-transformed-names --xform 's#^[^/]*#php-'"$VERSION"'#'
 fi
 
 #read customizations
-source 'options.sh' "$version" "$vmajor" "$vminor" "$vpatch"
+source 'options.sh' "$VERSION" "$VMAJOR" "$VMINOR" "$VPATCH"
 cd "$srcdir"
 
 #only configure/make during the first install of a new version
@@ -118,6 +115,20 @@ fi
 if [ $configure -gt $tstamp ]; then
     #configuring
     echo "(Re-)configuring"
+    if [ $DEBUG = 1 ]; then
+        $configoptions="--enable-debug $configoptions"
+    fi
+    if [ $ZTS = 1 ]; then
+        $configoptions="--enable-zts $configoptions"
+    fi
+    if [ $GCOV = 1 ]; then
+        $configoptions="--enable-gcov $configoptions"
+    fi
+    if [ $ARCH32 = 1 ]; then
+        CFLAGS="$CFLAGS -m32"
+        export CFLAGS
+    fi
+
     ./configure \
      $configoptions \
      --prefix="$instdir" \
@@ -192,7 +203,7 @@ if [ -f "$initarget" ]; then
     [ ! -e "$custom" ] && cp "default-custom-php.ini" "$custom"
 
     ext_dir=`"$instdir/bin/php-config" --extension-dir`
-    for suffix in "" "-$vmajor" "-$vmajor.$vminor" "-$vmajor.$vminor.$vpatch"; do
+    for suffix in "" "-$VMAJOR" "-$VMAJOR.$VMINOR" "-$VMAJOR.$VMINOR.$VPATCH"; do
         custom="custom/php$suffix.ini"
         [ -e "$custom" ] && sed -e 's#$ext_dir#'"$ext_dir"'#' "$custom" >> "$initarget"
     done
@@ -210,9 +221,9 @@ fi
 bphp="$instdir/bin/php"
 bphpgcno="$instdir/bin/php.gcno"
 if [ -f "$bphp" ]; then
-    ln -fs "$bphp" "$shbindir/php-$version"
+    ln -fs "$bphp" "$shbindir/php-$VERSION"
 elif [ -f "$bphpgcno" ]; then
-    ln -fs "$bphpgcno" "$shbindir/php-$version"
+    ln -fs "$bphpgcno" "$shbindir/php-$VERSION"
 else
     echo "no php binary found"
     exit 7
@@ -222,37 +233,37 @@ fi
 bphpcgi="$instdir/bin/php-cgi"
 bphpcgigcno="$instdir/bin/php-cgi.gcno"
 if [ -f "$bphpcgi" ]; then
-    ln -fs "$bphpcgi" "$shbindir/php-cgi-$version"
+    ln -fs "$bphpcgi" "$shbindir/php-cgi-$VERSION"
 elif [ -f "$bphpcgigcno" ]; then
-    ln -fs "$bphpcgigcno" "$shbindir/php-cgi-$version"
+    ln -fs "$bphpcgigcno" "$shbindir/php-cgi-$VERSION"
 else
     echo "no php-cgi binary found"
     exit 8
 fi
 
-ln -fs "$instdir/bin/php-config" "$shbindir/php-config-$version"
-ln -fs "$instdir/bin/phpize" "$shbindir/phpize-$version"
+ln -fs "$instdir/bin/php-config" "$shbindir/php-config-$VERSION"
+ln -fs "$instdir/bin/phpize" "$shbindir/phpize-$VERSION"
 
 # If PEAR was installed, finish the setup here.
 if [ -e "$instdir/bin/pear" ]; then
-    ln -fs "$instdir/bin/pear" "$shbindir/pear-$version"
-    ln -fs "$instdir/bin/peardev" "$shbindir/peardev-$version"
-    ln -fs "$instdir/bin/pecl" "$shbindir/pecl-$version"
+    ln -fs "$instdir/bin/pear" "$shbindir/pear-$VERSION"
+    ln -fs "$instdir/bin/peardev" "$shbindir/peardev-$VERSION"
+    ln -fs "$instdir/bin/pecl" "$shbindir/pecl-$VERSION"
 fi
 
 # Recent versions of PHP come with a phar.phar archive
 # that makes it easy to manipulate PHP archives.
 # Let's be user-friendly and add a link to it if it exists.
 if [ -e "$instdir/bin/phar.phar" ]; then
-    ln -fs "$instdir/bin/phar.phar" "$shbindir/phar-$version"
+    ln -fs "$instdir/bin/phar.phar" "$shbindir/phar-$VERSION"
 fi
 
 cd "$basedir"
-./pyrus.sh "$version" "$instdir"
+./pyrus.sh "$VERSION" "$instdir"
 
 # Post-install stuff
-for suffix in "" "-$vmajor" "-$vmajor.$vminor" "-$vmajor.$vminor.$vpatch"; do
+for suffix in "" "-$VMAJOR" "-$VMAJOR.$VMINOR" "-$VMAJOR.$VMINOR.$VPATCH"; do
     post="custom/post-install$suffix.sh"
-    [ -e "$post" ] && /bin/bash "$post" "$version" "$instdir" "$shbindir"
+    [ -e "$post" ] && /bin/bash "$post" "$VERSION" "$instdir" "$shbindir"
 done
 exit 0
