@@ -268,6 +268,10 @@ cd "$basedir"
 # Post-install stuff
 for suffix in "" "-$VMAJOR" "-$VMAJOR.$VMINOR" "-$VMAJOR.$VMINOR.$VPATCH"; do
     post="custom/post-install$suffix.sh"
-    [ -e "$post" ] && /bin/bash "$post" "$VERSION" "$instdir" "$shbindir"
+    if [ -e "$post" ]; then
+        echo ""
+        echo "Running commands from '$post'"
+        /bin/bash "$post" "$VERSION" "$instdir" "$shbindir"
+    fi
 done
 exit 0
