@@ -108,10 +108,12 @@ cd "$srcdir"
 #only configure/make during the first install of a new version
 #or after some change occurred in customizations.
 tstamp=0
-if [ -f "config.nice" ]; then
-   tstamp=`stat -c '%Y' "config.nice"`
+if [ -f "config.nice" -a -f "config.status" ]; then
+   tstamp=`stat -c '%Y' "config.status"`
 fi
 
+echo "Last config. change:   $configure"
+echo "Last ./configure:      $tstamp"
 if [ $configure -gt $tstamp ]; then
     #configuring
     echo "(Re-)configuring"
@@ -139,6 +141,8 @@ if [ $configure -gt $tstamp ]; then
         echo configure.sh failed.
         exit 3
     fi
+else
+    echo "Skipping ./configure step"
 fi
 
 

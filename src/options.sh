@@ -15,7 +15,7 @@ vmajor=$2
 vminor=$3
 vpatch=$4
 
-configure=0
+configure=`stat -c '%Y' "options.sh"`
 configoptions="\
 --disable-short-tags \
 --with-layout=GNU \

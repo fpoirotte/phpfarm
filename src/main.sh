@@ -32,7 +32,6 @@ basedir=`pwd`
 versions=()
 for arg; do
     if [ "x$arg" != "x" ]; then
-        echo "arg: $arg"
         versions[${#versions[@]}]="$arg"
     fi
 done
