@@ -69,12 +69,14 @@ done
 
 # Set the main version.
 if [ -n "$main_version" ]; then
-    echo "Setting $main_version as your main PHP version"
+    source helpers.sh
+    parse_version "$main_version"
+    echo "Setting $VERSION as your main PHP version"
     #directory phps get installed into
     instbasedir="`readlink -f "$basedir/../inst"`"
     #directory this specific version was installed into
-    instdir="$instbasedir/php-$version"
-    ln -sf "$instbasedir/php-$version/bin" "$instbasedir/main"
+    instdir="$instbasedir/php-$VERSION"
+    ln -sf -T "$instbasedir/php-$VERSION/bin" "$instbasedir/main"
 fi
 
 exit 0
