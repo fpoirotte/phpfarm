@@ -118,13 +118,13 @@ if [ $configure -gt $tstamp ]; then
     #configuring
     echo "(Re-)configuring"
     if [ $DEBUG = 1 ]; then
-        $configoptions="--enable-debug $configoptions"
+        configoptions="--enable-debug $configoptions"
     fi
     if [ $ZTS = 1 ]; then
-        $configoptions="--enable-zts $configoptions"
+        configoptions="--enable-zts $configoptions"
     fi
     if [ $GCOV = 1 ]; then
-        $configoptions="--enable-gcov $configoptions"
+        configoptions="--enable-gcov $configoptions"
     fi
     if [ $ARCH32 = 1 ]; then
         CFLAGS="$CFLAGS -m32"
