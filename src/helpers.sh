@@ -40,18 +40,14 @@ parse_version() {
     ARCH32=0
     GCOV=0
     for p in $v; do
-        if [ "$p" = "debug" ]; then
-            DEBUG=1
-        fi
-        if [ "$p" = "zts" ]; then
-            ZTS=1
-        fi
-        if [ "$p" = "32bits" ]; then
-            ARCH32=1
-        fi
-        if [ "$p" = "gcov" ]; then
-            GCOV=1
-        fi
+        case $p in
+            debug)  DEBUG=1;;
+            zts)    ZTS=1;;
+            32bits) ARCH32=1;;
+            gcov)   GCOV=1;;
+            *)      echo "Unsupported token '$p'";
+                    return 2;;
+        esac
     done
 
     # normalize version string
@@ -69,6 +65,7 @@ parse_version() {
     if [ $GCOV = 1 ]; then
         VERSION="$VERSION-gcov"
     fi
+
     return 0
 }
 

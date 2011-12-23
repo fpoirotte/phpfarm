@@ -34,7 +34,7 @@ basedir=`pwd`
 source helpers.sh
 parse_version $1
 if [ $? -ne 0 ]; then
-    echo 'Please specify php version'
+    echo 'Please specify a valid php version'
     exit 1
 fi
 
