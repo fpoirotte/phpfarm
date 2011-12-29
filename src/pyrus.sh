@@ -42,7 +42,7 @@ if [ ! -e "$pyrusphar" ]; then
     exit 3
 fi
 
-cp "$pyrusphar" "$pyrustarget"
+ln -sfT "../../src/bzips/pyrus.phar" "$pyrustarget"
 chmod +x "$pyrustarget"
 mkdir -p "$instdir/pear"
 
