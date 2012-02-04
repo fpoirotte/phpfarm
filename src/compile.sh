@@ -34,7 +34,7 @@ basedir=`pwd`
 source helpers.sh
 parse_version $1
 if [ $? -ne 0 ]; then
-    echo 'Please specify a valid php version'
+    echo 'Please specify a valid php version' >&2
     exit 1
 fi
 
@@ -92,13 +92,60 @@ if [ ! -d "$srcdir" ]; then
         fi
 
         if [ ! -f "$srcfile" ]; then
-            echo "Fetching sources failed:"
-            echo $url
+            echo "Fetching sources failed:" >&2
+            echo $url >&2
             exit 2
         fi
     fi
     #extract
     tar xjvf "$srcfile" --show-transformed-names --xform 's#^[^/]*#php-'"$VERSION"'#'
+fi
+
+#do we need the Suhosin patch?
+if [ $SUHOSIN = 1 ]; then
+    echo "Grabbing the appropriate Suhosin patch for PHP $SHORT_VERSION"
+    verfile="$bzipsdir/suhosin-patch-$SHORT_VERSION.patch.gz"
+    if [ ! -e "$verfile" ]; then
+        # Suhosin adds its own version to the patch's name,
+        # hence we must find the correct name first.
+        re_version=`echo "$SHORT_VERSION" | sed 's/\./\\\\./g'`
+        url=`wget -O- http://www.hardened-php.net/suhosin/download.html 2> /dev/null | grep -o 'href="http://download.suhosin.org/suhosin-patch-'"$re_version"'-[0-9.]\+.patch.gz"' | cut -d'"' -f2 | head -n 1`
+        if [ -z "$url" ]; then
+            echo "ERROR: no version of the Suhosin patch applies to PHP $SHORT_VERSION" >&2
+            exit 2
+        fi
+
+        # Ok, so now we have an applicable patch.
+        srcfile="$bzipsdir/`basename "$url"`"
+        suhosin_ver=`basename "$url" .patch.gz | cut -d- -f4`
+        echo "Found Suhosin patch version $suhosin_ver ..."
+
+        # The patch was never downloaded before. Download it now.
+        if [ ! -e "$srcfile" ]; then
+            wget -P "$bzipsdir" -O "$srcfile" "$url"
+            if [ ! -s "$srcfile" -a -f "$srcfile" ]; then
+                rm "$srcfile"
+            fi
+        fi
+
+        if [ ! -f "$srcfile" ]; then
+            echo "Fetching sources failed:" >&2
+            echo $patch_url >&2
+            exit 2
+        fi
+
+        # Add a symlink whose name is based on PHP version only.
+        # eg. suhosin-patch-5.3.9.patch.gz -> suhosin-patch-5.3.9-0.9.10.patch.gz
+        ln -sT "`basename "$url"`" "$verfile"
+
+        # Apply the patch.
+        echo "Applying Suhosin patch (v$suhosin_ver) for PHP $SHORT_VERSION"
+        gunzip -c -d "$verfile" | patch -p1 -d "$basedir/$srcdir" >&2
+        if [ $? -ne 0 ]; then
+            echo "Failed to apply Suhosin patch"
+            exit 2
+        fi
+    fi
 fi
 
 #read customizations
@@ -138,7 +185,7 @@ if [ $configure -gt $tstamp ]; then
      --with-pear="$instdir/pear"
 
     if [ $? -gt 0 ]; then
-        echo configure.sh failed.
+        echo configure.sh failed. >&2
         exit 3
     fi
 else
@@ -160,13 +207,13 @@ if [ -n "$unknown_options" ]; then
     # If the error comes from a previous run, ./configure won't kick in and
     # it won't display the error message. We do the work in its place here.
     if [ $configure -le $tstamp ]; then
-        echo "ERROR: The following unrecognized configure options were used:"
-        echo ""
-        echo $unknown_options
-        echo ""
-        echo "Check 'configure --help' for available options."
+        echo "ERROR: The following unrecognized configure options were used:" >&2
+        echo "" >&2
+        echo $unknown_options >&2
+        echo "" >&2
+        echo "Check 'configure --help' for available options." >&2
     fi
-    echo "Please fix your configure options and try again."
+    echo "Please fix your configure options and try again." >&2
     exit 3
 fi
 
@@ -216,7 +263,7 @@ fi
 #create bin
 [ ! -d "$shbindir" ] && mkdir "$shbindir"
 if [ ! -d "$shbindir" ]; then
-    echo "Cannot create shared bin dir"
+    echo "Cannot create shared bin dir" >&2
     exit 6
 fi
 #symlink all files
@@ -229,7 +276,7 @@ if [ -f "$bphp" ]; then
 elif [ -f "$bphpgcno" ]; then
     ln -fs "$bphpgcno" "$shbindir/php-$VERSION"
 else
-    echo "no php binary found"
+    echo "no php binary found" >&2
     exit 7
 fi
 
@@ -241,7 +288,7 @@ if [ -f "$bphpcgi" ]; then
 elif [ -f "$bphpcgigcno" ]; then
     ln -fs "$bphpcgigcno" "$shbindir/php-cgi-$VERSION"
 else
-    echo "no php-cgi binary found"
+    echo "no php-cgi binary found" >&2
     exit 8
 fi
 

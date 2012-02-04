@@ -54,7 +54,7 @@ if [ $# -eq 0 ]; then
 fi
 
 if [ ${#versions[@]} -eq 0 ]; then
-    echo 'Please specify php version or create "custom/default-versions.txt" file'
+    echo 'Please specify php version or create "custom/default-versions.txt" file' >&2
     exit 1
 fi
 
@@ -62,7 +62,7 @@ for version in "${versions[@]}"; do
     ./compile.sh "$version"
     res=$?
     if [ $res -ne 0 ]; then
-        echo "An error occurred while trying to install PHP $version."
+        echo "An error occurred while trying to install PHP $version." >&2
         exit $res
     fi
 done

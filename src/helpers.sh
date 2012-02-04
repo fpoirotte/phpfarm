@@ -7,7 +7,7 @@ parse_version() {
     # Inputs:
     # $1: version string to parse.
     #     Eg. "5.4.0RC1-debug-unknown_token"
-    #     Valid tokens: zts, debug, 32bits, gcov.
+    #     Valid tokens: zts, debug, 32bits, gcov, suhosin.
     #
     # Outputs:
     # $VMAJOR: major number (5)
@@ -17,6 +17,7 @@ parse_version() {
     # $ZTS: set to 1 if asked for ZTS support
     # $ARCH32: set to 1 for a 32bits build on a 64bits machine
     # $GCOV: set to 1 if asked for GCOV support
+    # $SUHOSIN: set to 1 if asked for Suhosin patch
     # $SHORT_VERSION: same as $VMAJOR.$VMINOR.$VPATCH
     # $VERSION: full version string, normalized.
     #           Eg. "5.4.0RC1-debug-zts-32bits-gcov"
@@ -39,20 +40,25 @@ parse_version() {
     ZTS=0
     ARCH32=0
     GCOV=0
+    SUHOSIN=0
     for p in $v; do
         case $p in
-            debug)  DEBUG=1;;
-            zts)    ZTS=1;;
-            32bits) ARCH32=1;;
-            gcov)   GCOV=1;;
-            *)      echo "Unsupported token '$p'";
-                    return 2;;
+            debug)      DEBUG=1;;
+            zts)        ZTS=1;;
+            32bits)     ARCH32=1;;
+            gcov)       GCOV=1;;
+            suhosin)    SUHOSIN=1;;
+            *)          echo "Unsupported token '$p'";
+                        return 2;;
         esac
     done
 
     # normalize version string
     VERSION="$VMAJOR.$VMINOR.$VPATCH"
     SHORT_VERSION="$VERSION"
+    if [ $SUHOSIN = 1 ]; then
+        VERSION="$VERSION-suhosin"
+    fi
     if [ $DEBUG = 1 ]; then
         VERSION="$VERSION-debug"
     fi

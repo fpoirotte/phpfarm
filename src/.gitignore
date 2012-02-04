@@ -1,4 +1,14 @@
+# Compilation directories for the various PHP versions.
 php-*/
+
+# Source archives for PHP.
 bzips/*.bz2
+
+# Source archive for Pyrus.
 bzips/*.phar
+
+# Source archives for Suhosin.
+bzips/*.patch.gz
+
+# Customizations.
 custom/*

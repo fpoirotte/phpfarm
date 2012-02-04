@@ -16,7 +16,7 @@ instdir="$2"
 
 if [ ! -d "$instdir" ]; then
     echo "PHP installation directory does not exist: $instdir"
-    exit 2
+    exit 1
 fi
 
 test $vmajor -gt 5 -o \( $vmajor -eq 5 -a $vminor -ge 3 \)
@@ -39,7 +39,7 @@ if [ ! -e "$pyrusphar" ]; then
 fi
 if [ ! -e "$pyrusphar" ]; then
     echo "Please put pyrus.phar into bzips/"
-    exit 3
+    exit 2
 fi
 
 ln -sfT "../../src/bzips/pyrus.phar" "$pyrustarget"

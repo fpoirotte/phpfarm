@@ -1,13 +1,24 @@
 phpfarm
 =======
 
-Set of scripts to install a dozen of PHP versions in parallel on a system.
-It also creates a Pyrus installation for each PHP version.
-Primarily developed for PEAR's continuous integration machine.
+phpfarm is a set of scripts to install a dozen of PHP versions in parallel
+on a single system. It also installs the pear and pyrus installers and
+creates a local Pyrus installation for each PHP version as well.
 
-The PHP source packages are fetched from ``museum.php.net`` (which is not
-always up-to-date), the official php.net download pages and the
-pre-release channels.
+This tool was primarily developed for PEAR's continuous integration machine.
+
+The PHP source packages are fetched from http://museum.php.net/ (which is not
+always up-to-date), the official php.net download pages and the pre-release
+channels.
+
+The Pyrus PHAR archive is fetched from http://pear2.php.net/pyrus.phar (which
+always refers the latest version).
+
+Last but not least, phpfarm can automatically apply the Suhosin patch
+for the version of PHP you are installing. It does so by looking at
+http://www.hardened-php.net/suhosin/download.html for compatible versions
+of the patch.
+
 If a file cannot be found, try to fetch it manually and put it into
 ``src/bzips/``.
 
@@ -61,6 +72,8 @@ variables are substitued:
   path for those extensions.
 
 
+.. _`post-install script`:
+
 Post-install customization
 --------------------------
 You may also create version-specific scripts that will be run after
@@ -74,30 +87,69 @@ the PHP binary has been successfully compiled, installed and configured:
 These scripts can be used for example to discover PEAR channels
 and pre-install some extensions/packages needed by your project.
 
+Each script is called with three arguments:
 
-Special tokens in version strings
----------------------------------
+- The PHP version that was just installed (eg. ``5.3.1-zts-suhosin-debug``).
+- The full path to the folder where that version was install
+  (eg. ``/home/clicky/phpfarm/inst/php-5.3.1-zts-suhosin-debug/``).
+- The full path to the shared folder containing the links to the main
+  executables for each version (eg. ``/home/clicky/phpfarm/inst/bin/``).
 
-phpfarm recognizes a few special tokens in the version string.
-These tokens must be appended to the version string and separated
+.. note::
+    You do not need to specify a "shebang line" (``#!...``) at the beginning
+    of the scripts. Bash will always be used to execute them.
+
+Given all the previous bits of information, the following shell script may
+be used to discover a PEAR channel and install a PEAR extension::
+
+    # "$3/pear-$1" could also be used in place of "$2/bin/pear" to refer
+    # to the pear installer for this specific version of PHP.
+    "$2/bin/pear" channel-discover pear.phpunit.de
+    "$2/bin/pear" install pear.phpunit.de/PHPUnit
+
+    # The exit status must be 0 when the scripts terminates without any error.
+    # Any other value will be treated as an error.
+    exit 0
+
+.. warning::
+    Your post-install customization script should always exit with a zero
+    status when they terminate normally. Any other value will be considered
+    a failure and will make phpfarm exit immediately with an error.
+
+
+Special flags in version strings
+--------------------------------
+
+phpfarm recognizes a few special flags in the version string.
+These flags must be appended to the version string and separated
 from it and from one another by dashes (-).
 
-The following tokens are currently accepted:
+The following flags are currently accepted:
 
 - ``debug`` to compile a version with debugging symbols.
 - ``zts`` to enable thread safety.
-- ``32bits`` to force the creation of a 32 bits version of PHP on a
-  64 bits machine.
+- ``32bits`` to force the creation of a 32 bits version of PHP on a 64 bits
+  machine.
 - ``gcov`` to enable GCOV code coverage information (requires LTP).
+- ``suhosin`` to apply the Suhosin patch before compiling PHP.
+  This patch provides several enhancements to build an hardened PHP binary.
+
+.. warning::
+    The ``suhosin`` flag only applies the Suhosin patch. It does not
+    automatically install the Suhosin extension. If you want to benefit
+    from the whole set of attack mitigation techniques provided by Suhosin,
+    you must also install the Suhosin extension separately (and manually),
+    using a `post-install script`_
 
 For example, to build a thread-safe version of PHP 5.3.1 with debugging
 symboles, use::
 
     ./main.sh  5.3.1-zts-debug
 
-**Note**: the order in which the tokens appear does not matter,
-phpfarm will reorganize them if needed. Hence, ``5.3.1-zts-debug``
-is effectively the same as ``5.3.1-debug-zts``.
+.. note::
+    The order in which the flags appear does not matter, phpfarm will
+    reorganize them if needed. Hence, ``5.3.1-zts-debug`` is effectively
+    the same as ``5.3.1-debug-zts``.
 
 Bonus features
 --------------
