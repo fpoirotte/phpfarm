@@ -168,7 +168,7 @@ if [ $configure -gt $tstamp ]; then
         configoptions="--enable-debug $configoptions"
     fi
     if [ $ZTS = 1 ]; then
-        configoptions="--enable-zts $configoptions"
+        configoptions="--enable-maintainer-zts $configoptions"
     fi
     if [ $GCOV = 1 ]; then
         configoptions="--enable-gcov $configoptions"
@@ -322,3 +322,4 @@ for suffix in "" "-$VMAJOR" "-$VMAJOR.$VMINOR" "-$VMAJOR.$VMINOR.$VPATCH"; do
     fi
 done
 exit 0
+
