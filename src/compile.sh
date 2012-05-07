@@ -175,7 +175,11 @@ if [ $configure -gt $tstamp ]; then
     fi
     if [ $ARCH32 = 1 ]; then
         CFLAGS="$CFLAGS -m32"
+        CXXFLAGS="$CXXFLAGS -m32"
+        LDFLAGS="$LDFLAGS -m32"
         export CFLAGS
+        export CXXFLAGS
+        export LDFLAGS
     fi
 
     ./configure \
