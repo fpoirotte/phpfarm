@@ -65,19 +65,19 @@ for version in "${versions[@]}"; do
         echo "An error occurred while trying to install PHP $version." >&2
         exit $res
     fi
-done
 
-# Set the main version.
-if [ -n "$main_version" ]; then
-    source helpers.sh
-    parse_version "$main_version"
-    echo "Setting $VERSION as your main PHP version"
-    #directory phps get installed into
-    instbasedir="`readlink -f "$basedir/../inst"`"
-    #directory this specific version was installed into
-    instdir="$instbasedir/php-$VERSION"
-    ln -sf -T "$instbasedir/php-$VERSION/bin" "$instbasedir/main"
-fi
+    # Set the main version.
+    if [ "$version" == "$main_version" ]; then
+        source helpers.sh
+        parse_version "$main_version"
+        echo "Setting $VERSION as your main PHP version"
+        #directory phps get installed into
+        instbasedir="`readlink -f "$basedir/../inst"`"
+        #directory this specific version was installed into
+        instdir="$instbasedir/php-$VERSION"
+        ln -sf -T "$instbasedir/php-$VERSION/bin" "$instbasedir/main"
+    fi
+done
 
 exit 0
 
