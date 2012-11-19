@@ -92,6 +92,17 @@ if [ ! -d "$srcdir" ]; then
         fi
 
         if [ ! -f "$srcfile" ]; then
+            echo "Fetching sources from stas's site failed"
+            echo $url
+            #use dsp's RC (5.5.x)
+            url="https://downloads.php.net/dsp/php-$SHORT_VERSION.tar.bz2"
+            wget -P "$bzipsdir" -O "$srcfile" "$url"
+        fi
+        if [ ! -s "$srcfile" -a -f "$srcfile" ]; then
+            rm "$srcfile"
+        fi
+
+        if [ ! -f "$srcfile" ]; then
             echo "Fetching sources failed:" >&2
             echo $url >&2
             exit 2
