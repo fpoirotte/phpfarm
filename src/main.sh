@@ -28,6 +28,7 @@
 basedir="`dirname "$0"`"
 cd "$basedir"
 basedir=`pwd`
+source helpers.sh
 
 versions=()
 for arg; do
@@ -64,7 +65,7 @@ done
 # Detect obsolete versions and suggest removing them,
 # but only if we were run without any arguments.
 if [ $# -eq 0 ]; then
-    for inst_version in `ls -1 "$instbasedir" | grep ^php-`; do
+    for inst_version in `ls -1 "../inst/" | grep ^php-`; do
         # Remove "php-" prefix.
         inst_version=${inst_version:4}
 
