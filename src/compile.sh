@@ -303,6 +303,13 @@ for binary in php php-cgi php-config phpize; do
     fi
 done
 
+#strip executables in non-debug builds.
+if [ $DEBUG != 1 ]; then
+    for binary in php php-cgi; do
+        strip --strip-unneeded "$instdir/bin/$binary"
+    done
+fi
+
 # If PEAR was installed, finish the setup here.
 # Recent versions of PHP come with a phar.phar archive
 # that makes it easy to manipulate PHP archives.
