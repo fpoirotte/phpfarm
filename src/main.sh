@@ -36,18 +36,12 @@ for arg; do
     fi
 done
 
-main_version=
 if [ $# -eq 0 ]; then
     default_versions="$basedir/custom/default-versions.txt"
     if [ -e "$default_versions" ]; then
         while read arg; do
             if [ "x$arg" != "x" -a "${arg:0:1}" != "#" ]; then
                 versions[${#versions[@]}]="$arg"
-
-                # The first entry in this file is the main version.
-                if [ -z "$main_version" ]; then
-                    main_version="$arg"
-                fi
             fi
         done < "$default_versions"
     fi
@@ -64,18 +58,6 @@ for version in "${versions[@]}"; do
     if [ $res -ne 0 ]; then
         echo "An error occurred while trying to install PHP $version." >&2
         exit $res
-    fi
-
-    # Set the main version.
-    if [ "$version" == "$main_version" ]; then
-        source helpers.sh
-        parse_version "$main_version"
-        echo "Setting $VERSION as your active PHP version"
-        #directory phps get installed into
-        instbasedir="`readlink -f "$basedir/../inst"`"
-        #directory this specific version was installed into
-        instdir="$instbasedir/php-$VERSION"
-        ln -sf -T "$instbasedir/php-$VERSION/bin" "$instbasedir/current-bin"
     fi
 done
 
