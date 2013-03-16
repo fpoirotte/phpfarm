@@ -92,6 +92,7 @@ if [ $# -eq 0 ]; then
                 rm -vf "$instbasedir/bin/php-$inst_version"
                 rm -vf "$instbasedir/bin/php-cgi-$inst_version"
                 rm -vf "$instbasedir/bin/php-config-$inst_version"
+                rm -vf "$instbasedir/bin/php-fpm-$inst_version"
                 rm -vf "$instbasedir/bin/phpize-$inst_version"
                 rm -vf "$instbasedir/bin/pyrus-$inst_version"
             fi

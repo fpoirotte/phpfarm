@@ -303,10 +303,15 @@ for binary in php php-cgi php-config phpize; do
     fi
 done
 
+#php-fpm
+if [ -f "$instdir/sbin/php-fpm" ]; then
+    ln -fs "$instdir/sbin/php-fpm" "$shbindir/php-fpm-$VERSION"
+fi
+
 #strip executables in non-debug builds.
 if [ $DEBUG != 1 ]; then
-    for binary in php php-cgi; do
-        strip --strip-unneeded "$instdir/bin/$binary"
+    for binary in php php-cgi php-fpm; do
+        strip --strip-unneeded "$shbindir/$binary-$VERSION"
     done
 fi
 
