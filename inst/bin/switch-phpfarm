@@ -26,4 +26,4 @@ fi
 
 ln -s "$phpdir/bin" "$binlink"
 echo Setting active PHP version to $version
-php --version
+$basedir/current-bin/php --version
