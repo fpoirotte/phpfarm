@@ -70,12 +70,12 @@ for version in "${versions[@]}"; do
     if [ "$version" == "$main_version" ]; then
         source helpers.sh
         parse_version "$main_version"
-        echo "Setting $VERSION as your main PHP version"
+        echo "Setting $VERSION as your active PHP version"
         #directory phps get installed into
         instbasedir="`readlink -f "$basedir/../inst"`"
         #directory this specific version was installed into
         instdir="$instbasedir/php-$VERSION"
-        ln -sf -T "$instbasedir/php-$VERSION/bin" "$instbasedir/main"
+        ln -sf -T "$instbasedir/php-$VERSION/bin" "$instbasedir/current-bin"
     fi
 done
 

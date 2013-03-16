@@ -1,3 +1,11 @@
-bin/*
+bin/pear-*
+bin/peardev-*
+bin/pecl-*
+bin/phar-*
+bin/php-*
+bin/php-config-*
+bin/phpize-*
+bin/pyrus-*
+
 php-*/
-main
+current-bin
