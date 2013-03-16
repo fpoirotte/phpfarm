@@ -320,7 +320,7 @@ fi
 # that makes it easy to manipulate PHP archives.
 # Let's be user-friendly and add symlinks to these tools.
 for binary in pear peardev pecl phar; do
-    if [ -e "$instdir/bin/pear" ]; then
+    if [ -e "$instdir/bin/$binary" ]; then
         ln -fs "$instdir/bin/$binary" "$shbindir/$binary-$VERSION"
     fi
 done
