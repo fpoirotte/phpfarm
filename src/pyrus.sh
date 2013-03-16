@@ -54,6 +54,4 @@ chmod +x "$pyrusbin"
 
 #symlink
 ln -sf "$pyrusbin" "$instdir/../bin/pyrus-$version"
-
-echo "include_path=\".:$instdir/pear/\"" >> "$instdir/etc/php.ini"
 exit 0
