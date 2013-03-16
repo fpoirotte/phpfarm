@@ -79,5 +79,49 @@ for version in "${versions[@]}"; do
     fi
 done
 
-exit 0
+# Detect obsolete versions and suggest removing them,
+# but only if we were run without any arguments.
+if [ $# -eq 0 ]; then
+    for inst_version in `ls -1 "$instbasedir" | grep ^php-`; do
+        # Remove "php-" prefix.
+        inst_version=${inst_version:4}
 
+        found=0
+        for version in "${versions[@]}"; do
+            parse_version "$version"
+            if [ "$inst_version" == "$VERSION" ]; then
+                found=1
+                break
+            fi
+        done
+
+        if [ $found -eq 0 ]; then
+            echo "Remove obsolete version $inst_version? [Y/n]"
+            read remove
+            if [ -z "$remove" -o "$remove" = "y" -o "$remove" = "Y" ]; then
+                rm -vfr "$instbasedir/php-$inst_version"
+
+                # Remove other leftover files.
+                rm -vf "$instbasedir/bin/pear-$inst_version"
+                rm -vf "$instbasedir/bin/peardev-$inst_version"
+                rm -vf "$instbasedir/bin/pecl-$inst_version"
+                rm -vf "$instbasedir/bin/phar-$inst_version"
+                rm -vf "$instbasedir/bin/php-$inst_version"
+                rm -vf "$instbasedir/bin/php-cgi-$inst_version"
+                rm -vf "$instbasedir/bin/php-config-$inst_version"
+                rm -vf "$instbasedir/bin/phpize-$inst_version"
+                rm -vf "$instbasedir/bin/pyrus-$inst_version"
+            fi
+
+            if [ -e "$basedir/php-$inst_version" ]; then
+                echo "Remove compilation directory $basedir/php-$inst_version? [Y/n]"
+                read remove
+                if [ -z "$remove" -o "$remove" = "y" -o "$remove" = "Y" ]; then
+                    rm -vfr "$basedir/php-$inst_version"
+                fi
+            fi
+        fi
+    done
+then
+
+exit 0
