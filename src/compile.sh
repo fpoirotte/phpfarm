@@ -185,9 +185,11 @@ if [ $configure -gt $tstamp ]; then
         configoptions="--enable-gcov $configoptions"
     fi
     if [ $ARCH32 = 1 ]; then
+        ARCH=i386
         CFLAGS="$CFLAGS -m32"
         CXXFLAGS="$CXXFLAGS -m32"
         LDFLAGS="$LDFLAGS -m32"
+        export ARCH
         export CFLAGS
         export CXXFLAGS
         export LDFLAGS
