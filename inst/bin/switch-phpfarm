@@ -2,11 +2,13 @@
 basedir="`dirname "$0"`/../"
 cd "$basedir"
 basedir=`pwd`
+binlink="$basedir/current-bin"
+active=`basename $(dirname $(readlink $binlink) 2>/dev/null) 2>/dev/null | sed -e 's/^php-//;s/\./\\\\./g'`
 
 if [ "$1" = "" ]; then
     echo Switch the currently active PHP version of phpfarm
     echo Available versions:
-    ls -1d php-*|sed -e 's/php-//' -e 's/^/ /'
+    ls -1d php-*|sed -e 's/^php-//' -e 's/^/  /' -e "s/^  \($active\)\$/* \1/"
     exit 1
 fi
 
@@ -18,7 +20,6 @@ if [ ! -d "$phpdir" ]; then
     exit 2
 fi
 
-binlink="$basedir/current-bin"
 if [ -e "$binlink" ]; then
     rm "$binlink"
 fi
