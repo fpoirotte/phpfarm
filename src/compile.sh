@@ -291,31 +291,17 @@ fi
 #symlink all files
 
 #php may be called php.gcno
-bphp="$instdir/bin/php"
-bphpgcno="$instdir/bin/php.gcno"
-if [ -f "$bphp" ]; then
-    ln -fs "$bphp" "$shbindir/php-$VERSION"
-elif [ -f "$bphpgcno" ]; then
-    ln -fs "$bphpgcno" "$shbindir/php-$VERSION"
-else
-    echo "no php binary found" >&2
-    exit 7
-fi
-
-#php-cgi may be called php.gcno
-bphpcgi="$instdir/bin/php-cgi"
-bphpcgigcno="$instdir/bin/php-cgi.gcno"
-if [ -f "$bphpcgi" ]; then
-    ln -fs "$bphpcgi" "$shbindir/php-cgi-$VERSION"
-elif [ -f "$bphpcgigcno" ]; then
-    ln -fs "$bphpcgigcno" "$shbindir/php-cgi-$VERSION"
-else
-    echo "no php-cgi binary found" >&2
-    exit 8
-fi
-
-ln -fs "$instdir/bin/php-config" "$shbindir/php-config-$VERSION"
-ln -fs "$instdir/bin/phpize" "$shbindir/phpize-$VERSION"
+#same for php-cgi.
+for binary in php php-cgi php-config phpize; do
+    if [ -f "$instdir/bin/$binary" ]; then
+        ln -fs "$instdir/bin/$binary" "$shbindir/$binary-$VERSION"
+    elif [ -f "$instdir/bin/$binary.gcno" ]; then
+        ln -fs "$instdir/bin/$binary.gcno" "$shbindir/$binary-$VERSION"
+    else
+        echo "no $binary found" >&2
+        exit 7
+    fi
+done
 
 # If PEAR was installed, finish the setup here.
 if [ -e "$instdir/bin/pear" ]; then
