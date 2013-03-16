@@ -104,6 +104,6 @@ if [ $# -eq 0 ]; then
             fi
         fi
     done
-then
+fi
 
 exit 0
