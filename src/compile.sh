@@ -252,6 +252,7 @@ fi
 
 #copy php.ini
 initarget="$instdir/etc/php.ini"
+mkdir -p "$instdir/etc/"
 if [ -f "php.ini-development" ]; then
     #php 5.3
     cp "php.ini-development" "$initarget"
