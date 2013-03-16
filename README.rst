@@ -31,9 +31,10 @@ Setup
 - ``./main.sh 5.3.0``
 - PHP gets installed into ``phpfarm/inst/php-$version/``
 - ``phpfarm/inst/bin/php-$version`` is also executable
-  You should add ``inst/bin`` and ``inst/current-bin`` to your ``$PATH``,
-  i.e. ``PATH="$PATH:$HOME/phpfarm/inst/bin:$HOME/phpfarm/inst/current-bin"``
-  in ``.bashrc``
+  You should add ``inst/bin``, ``inst/current/bin`` and
+  ``inst/current/sbin`` to your ``$PATH``, i.e.
+  ``PATH="$PATH:$HOME/phpfarm/inst/bin:$HOME/phpfarm/inst/current/bin:$HOME/phpfarm/inst/current/sbin"``
+  in your ``.bashrc``
 
 
 Configure options customization
