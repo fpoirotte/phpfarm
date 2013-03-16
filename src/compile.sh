@@ -304,18 +304,14 @@ for binary in php php-cgi php-config phpize; do
 done
 
 # If PEAR was installed, finish the setup here.
-if [ -e "$instdir/bin/pear" ]; then
-    ln -fs "$instdir/bin/pear" "$shbindir/pear-$VERSION"
-    ln -fs "$instdir/bin/peardev" "$shbindir/peardev-$VERSION"
-    ln -fs "$instdir/bin/pecl" "$shbindir/pecl-$VERSION"
-fi
-
 # Recent versions of PHP come with a phar.phar archive
 # that makes it easy to manipulate PHP archives.
-# Let's be user-friendly and add a link to it if it exists.
-if [ -e "$instdir/bin/phar.phar" ]; then
-    ln -fs "$instdir/bin/phar.phar" "$shbindir/phar-$VERSION"
-fi
+# Let's be user-friendly and add symlinks to these tools.
+for binary in pear peardev pecl phar.phar; do
+    if [ -e "$instdir/bin/pear" ]; then
+        ln -fs "$instdir/bin/$binary" "$shbindir/$binary-$VERSION"
+    fi
+done
 
 cd "$basedir"
 ./pyrus.sh "$VERSION" "$instdir"
