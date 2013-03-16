@@ -22,7 +22,7 @@
 # Put pyrus.phar into bzips/ to automatically get version-specific
 # pyrus/pear2 commands.
 #
-# Author: Christian Weiske <cweiske@php.net>
+# Author: François Poirotte <clicky@erebot.net>
 #
 
 basedir="`dirname "$0"`"
