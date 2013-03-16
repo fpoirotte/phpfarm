@@ -3,7 +3,7 @@ basedir="`dirname "$0"`/../"
 cd "$basedir"
 basedir=`pwd`
 binlink="$basedir/current-bin"
-active=`basename $(dirname $(readlink $binlink) 2>/dev/null) 2>/dev/null | sed -e 's/^php-//;s/\./\\\\./g'`
+active=`basename $(dirname $(readlink "$binlink") 2>/dev/null) 2>/dev/null | sed -e 's/^php-//;s/\./\\\\./g'`
 
 if [ "$1" = "" ]; then
     echo Switch the currently active PHP version of phpfarm
