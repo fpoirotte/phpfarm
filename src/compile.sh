@@ -319,7 +319,7 @@ fi
 # Recent versions of PHP come with a phar.phar archive
 # that makes it easy to manipulate PHP archives.
 # Let's be user-friendly and add symlinks to these tools.
-for binary in pear peardev pecl phar.phar; do
+for binary in pear peardev pecl phar; do
     if [ -e "$instdir/bin/pear" ]; then
         ln -fs "$instdir/bin/$binary" "$shbindir/$binary-$VERSION"
     fi
