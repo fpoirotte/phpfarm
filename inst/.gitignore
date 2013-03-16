@@ -1,11 +1,4 @@
-bin/pear-*
-bin/peardev-*
-bin/pecl-*
-bin/phar-*
-bin/php-*
-bin/php-config-*
-bin/phpize-*
-bin/pyrus-*
-
+bin/*
+!bin/switch-phpfarm
 php-*/
 current-bin

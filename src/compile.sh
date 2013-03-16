@@ -251,8 +251,11 @@ if [ "$?" -gt 0 ]; then
 fi
 
 #copy php.ini
-initarget="$instdir/etc/php.ini"
-mkdir -p "$instdir/etc/"
+#you can define your own ini target directory by setting $initarget
+if [ "x$initarget" = x ]; then
+    initarget="$instdir/etc/php.ini"
+fi
+mkdir -p `dirname "$initarget"`
 if [ -f "php.ini-development" ]; then
     #php 5.3
     cp "php.ini-development" "$initarget"
@@ -261,7 +264,7 @@ elif [ -f "php.ini-recommended" ]; then
     cp "php.ini-recommended" "$initarget"
 else
     echo "No php.ini file found."
-    echo "Please copy it manually to $instdir/etc/php.ini"
+    echo "Please copy it manually to $initarget"
 fi
 
 #set default ini values
@@ -274,8 +277,9 @@ if [ -f "$initarget" ]; then
     ext_dir=`"$instdir/bin/php-config" --extension-dir`
     for suffix in "" "-$VMAJOR" "-$VMAJOR.$VMINOR" "-$VMAJOR.$VMINOR.$VPATCH"; do
         custom="custom/php$suffix.ini"
-        [ -e "$custom" ] && sed -e 's#$ext_dir#'"$ext_dir"'#' "$custom" >> "$initarget"
+        [ -e "$custom" ] && cat "$custom" >> "$initarget"
     done
+    sed -i -e 's#$ext_dir#'"$ext_dir"'#' -e 's#$install_dir#'"$instdir"'#' "$initarget"
 fi
 
 #create bin
