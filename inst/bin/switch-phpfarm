@@ -20,10 +20,6 @@ if [ ! -d "$phpdir" ]; then
     exit 2
 fi
 
-if [ -e "$binlink" ]; then
-    rm "$binlink"
-fi
-
-ln -s "$phpdir" "$binlink"
+ln -sf "$phpdir" "$binlink"
 echo Setting active PHP version to $version
 $basedir/current/bin/php --version
