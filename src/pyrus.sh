@@ -34,7 +34,7 @@ pyrusphar="$basedir/bzips/pyrus.phar"
 pyrustarget="$instdir/pyrus.phar"
 if [ ! -e "$pyrusphar" ]; then
     #download pyrus from svn
-    wget -O "$pyrusphar"\
+    wget -O "$pyrusphar" \
         "http://pear2.php.net/pyrus.phar"
 fi
 if [ ! -e "$pyrusphar" ]; then

@@ -329,8 +329,7 @@ if [ -f "$initarget" ]; then
     custom="custom/php.ini"
     [ ! -e "$custom" ] && cp "default-custom-php.ini" "$custom"
 
-    ext_dir=`"$instdir/bin/php-config" --extension-dir`
-    for suffix in "" "-$VMAJOR" "-$VMAJOR.$VMINOR" "-$VMAJOR.$VMINOR.$VPATCH"; do
+    for suffix in "" "-$VMAJOR" "-$VMAJOR.$VMINOR" "-$SHORT_VERSION" "-$VERSION"; do
         custom="custom/php$suffix.ini"
         [ -e "$custom" ] && cat "$custom" >> "$initarget"
     done
@@ -371,9 +370,9 @@ if [ $DEBUG != 1 ]; then
 fi
 
 # If PEAR was installed, finish the setup here.
-# Recent versions of PHP come with a phar.phar archive
+# Recent versions of PHP also come with a phar.phar archive
 # that makes it easy to manipulate PHP archives.
-# Let's be user-friendly and add symlinks to these tools.
+# Let's be user-friendly and add symlinks to all these tools.
 for binary in pear peardev pecl phar; do
     if [ -e "$instdir/bin/$binary" ]; then
         ln -fs "$instdir/bin/$binary" "$shbindir/$binary-$VERSION"
@@ -384,7 +383,7 @@ cd "$basedir"
 ./pyrus.sh "$VERSION" "$instdir"
 
 # Post-install stuff
-for suffix in "" "-$VMAJOR" "-$VMAJOR.$VMINOR" "-$VMAJOR.$VMINOR.$VPATCH"; do
+for suffix in "" "-$VMAJOR" "-$VMAJOR.$VMINOR" "-$SHORT_VERSION" "-$VERSION"; do
     post="custom/post-install$suffix.sh"
     if [ -e "$post" ]; then
         echo ""
