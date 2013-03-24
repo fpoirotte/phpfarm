@@ -128,8 +128,8 @@ Each script is called with three arguments:
 Given all the previous bits of information, the following shell script may
 be used to discover a PEAR channel and install a PEAR extension::
 
-    # "$3/pear-$1" could also be used in place of "$2/bin/pear" to refer
-    # to the pear installer for this specific version of PHP.
+    # "$3/pear-$1" could also be used in place of "$2/bin/pear"
+    # (both refer to the pear installer for this specific version of PHP).
     "$2/bin/pear" channel-discover pear.phpunit.de
     "$2/bin/pear" install pear.phpunit.de/PHPUnit
 
@@ -152,13 +152,59 @@ from it and from one another by dashes (-).
 
 The following flags are currently accepted:
 
-- ``debug`` to compile a version with debugging symbols.
-- ``zts`` to enable thread safety.
-- ``32bits`` to force the creation of a 32 bits version of PHP on a 64 bits
-  machine.
-- ``gcov`` to enable GCOV code coverage information (requires LTP).
-- ``suhosin`` to apply the Suhosin patch before compiling PHP.
-  This patch provides several enhancements to build an hardened PHP binary.
+-   ``32bits`` to force the creation of a 32 bits version of PHP on a 64 bits
+    machine.
+
+    ..  note::
+        If specified, this flag appears in the final name of the PHP binary
+        (eg. ``php-5.4.13-32bits``).
+
+-   ``debug`` to compile a version with debugging symbols.
+
+    ..  note::
+        If specified, this flag appears in the final name of the PHP binary
+        (eg. ``php-5.4.13-debug``).
+        On the other hand, if this flag is not specified, the debugging symbols
+        and other unnecessary data will be stripped from the binaries produced
+        (resulting in slightly smaller binaries being installed).
+
+-   ``gcov`` to enable GCOV code coverage information (requires LTP).
+
+    ..  note::
+        If specified, this flag appears in the final name of the PHP binary
+        (eg. ``php-5.4.13-gcov``).
+
+-   ``pear`` to install the pear/pecl utilities
+    (useful if you plan to install packages from the
+    `PHP Extension and Application Repository`__
+    or extensions from the `PHP Extension Community Library`__).
+
+    ..  note::
+        For this to work, you also need to drop a copy of the
+        `install-pear-nozlib.phar`__ archive in the ``bzips/`` folder.
+
+         Users of PHP 5.5.0alpha1 and later may instead prefer `this link`__
+         which includes a more up-to-date version of the ``Archive_Tar``
+         package, as a workaround for `bug #63073`__.
+
+-   ``suhosin`` to apply the Suhosin patch before compiling PHP.
+    This patch provides several enhancements to build an hardened PHP binary.
+
+    ..  note::
+        If specified, this flag appears in the final name of the PHP binary
+        (eg. ``php-5.4.13-suhosin``).
+
+-   ``zts`` to enable the Zend Thread Safety mechanisms.
+
+    ..  note::
+        If specified, this flag appears in the final name of the PHP binary
+        (eg. ``php-5.4.13-zts``).
+
+__  http://pear.php.net/
+__  http://pecl.php.net/
+__  http://pear.php.net/install-pear-nozlib.phar
+__  http://packages.erebot.net/install-pear-nozlib.phar
+__  https://bugs.php.net/bug.php?id=63073
 
 .. warning::
     The ``suhosin`` flag only applies the Suhosin patch. It does not
@@ -168,14 +214,22 @@ The following flags are currently accepted:
     using a `post-install script`_
 
 For example, to build a thread-safe version of PHP 5.3.1 with debugging
-symboles, use::
+symbols, use::
 
     ./main.sh  5.3.1-zts-debug
 
-.. note::
+..  note::
     The order in which the flags appear does not matter, phpfarm will
     reorganize them if needed. Hence, ``5.3.1-zts-debug`` is effectively
     the same as ``5.3.1-debug-zts``.
+
+..  note::
+    The order of the flags in the name of the final binary will always match
+    the order in which they are listed above.
+    Therefore, a PHP 5.4.13 binary with all the flags applied would be named
+    ``php-5.4.13-32bits-debug-gcov-suhosin-zts``.
+    Future versions of phpfarm will continue to use that same logic whenever
+    new flags are added.
 
 
 Bonus features
@@ -212,20 +266,50 @@ Caveats
 The following entries are known issues which may or may not be solved
 in the future:
 
-- Do not use ``--enable-sigchld`` in your custom options if you plan
-  to install extensions using pear/pecl. When enabled, this option
-  will result in a failure during the ``phpize`` step (this issue
-  lies in PHP itself and is not specific to phpfarm).
+-   Do not use ``--enable-sigchld`` in your custom options if you plan
+    to install extensions using pear/pecl. When enabled, this option
+    will result in a failure during the ``phpize`` step (this issue
+    lies in PHP itself and is not specific to phpfarm).
 
-- By default, a (local) PEAR installation is created for every PHP version
-  you build. If you don't plan to use PEAR, you can prevent this from
-  happening by adding ``--without-pear`` to your ``$configoptions``.
+-   The ``--with-pear=DIR`` configure option has been disabled on purpose
+    and this behaviour cannot be changed using ``$configoptions``.
+    If you want to create a (local) PEAR installation, drop a copy
+    of http://pear.php.net/install-pear-nozlib.phar in the ``bzips/`` folder
+    and then use the ``pear`` flag. The layout of the PEAR installation
+    that is created matches the layout expected by the Pyrus package manager.
+
+-   While this specific version of phpfarm strives to maintain compatibility
+    with the original one, a few incompatible changes were made.
+    These changes and the rationale behind them are listed below:
+
+    -   Historically, this phpfarm created a symbolic link in the installation
+        folder named ``main`` pointing to the "main PHP version" (the one you
+        would usually add to your ``$PATH``).
+        The original phpfarm later added a similar concept with a link named
+        ``current-bin`` pointing to the main version's ``bin/`` directory.
+
+        However, looking at the future, this link seems a little bit too
+        restrictive as some binaries may also be installed in the ``sbin/``
+        directory (eg. ``php-fpm``).
+
+        Therefore, this version of phpfarm now uses a symbolic link named
+        ``current`` (to roughly match the decision of the original phpfarm)
+        pointing to the main version's root directory.
+
+    -   The original phpfarm added a script named ``switch-phpfarm`` at some
+        time to ease switching between different PHP versions.
+
+        While this version has a similar script (derived from the original one),
+        its output is formatted slightly differently: there is an additional
+        space before the name of each installed version and an asterisk (\*)
+        appears before the name of the currently active version.
+        See `Switching default php versions`_ for an example of such output.
 
 
 About phpfarm
 -------------
 Written by Christian Weiske, cweiske@cweiske.de
-Additional patches by François Poirotte, clicky@erebot.net
+Additional changes by François Poirotte, clicky@erebot.net
 
 Homepage: https://sourceforge.net/p/phpfarm
 
