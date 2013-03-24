@@ -236,18 +236,73 @@ fi
 
 if [ $configure -gt $tstamp -o ! -f sapi/cli/php ]; then
     #compile sources
-    #make clean
     make
     if [ "$?" -gt 0 ]; then
-        echo make failed.
+        echo "make failed."
         exit 4
     fi
 fi
 
+#install SAPIs, etc.
 make install
 if [ "$?" -gt 0 ]; then
-    echo make install failed.
+    echo "make install failed."
     exit 5
+fi
+
+#determine path to extension directory
+ext_dir=`"$instdir/bin/php-config" --extension-dir`
+
+#install PEAR separately
+if [ $PEAR = 1 ]; then
+    pearphar="$basedir/bzips/install-pear-nozlib.phar"
+    if [ ! -e "$pearphar" ]; then
+        #download PEAR installer
+        wget -O "$pearphar" \
+            "http://pear.php.net/install-pear-nozlib.phar"
+    fi
+    if [ ! -e "$pearphar" ]; then
+        echo "Please put install-pear-nozlib.phar into bzips/"
+        exit 2
+    fi
+
+    echo "Installing PEAR environment:     $instdir/pear/"
+    mkdir -p "$instdir/pear/php"
+    sapi/cli/php -n                 \
+        -ddisplay_startup_errors=0  \
+        -dextension_dir="$ext_dir"  \
+        -dextension=phar.so         \
+        -dextension=xml.so          \
+        -dextension=pcre.so         \
+        -dshort_open_tag=0          \
+        -dsafe_mode=0               \
+        -dopen_basedir=             \
+        -derror_reporting=1803      \
+        -dmemory_limit=-1           \
+        -ddetect_unicode=0          \
+        "$pearphar"                 \
+            -dp         "a"                         \
+            -ds         "-$VERSION"                 \
+            --dir       "$instdir/pear/php"         \
+            --bin       "$instdir/bin"              \
+            --config    "$instdir/pear/cfg"         \
+            --www       "$instdir/pear/www"         \
+            --data      "$instdir/pear/data"        \
+            --doc       "$instdir/pear/docs"        \
+            --test      "$instdir/pear/tests"       \
+            --cache     "$instdir/pear/cache"       \
+            --temp      "$instdir/pear/temp"        \
+            --download  "$instdir/pear/downloads"
+    if [ "$?" -gt 0 ]; then
+        echo PEAR installation failed.
+        exit 5
+    fi
+
+    #add symlink to extension directory as "ext"
+    #for compatibility with Pyrus.
+    ln -sfT "$ext_dir" "$instdir/pear/ext"
+    #add a symlink to PEAR's cfg_dir for convenience.
+    ln -sfT "$instdir/pear/cfg" "$instdir/etc/pear"
 fi
 
 #copy php.ini
