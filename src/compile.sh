@@ -195,27 +195,41 @@ if [ $configure -gt $tstamp ]; then
         export LDFLAGS
     fi
 
-    ./configure \
-     $configoptions \
-     --prefix="$instdir" \
-     --exec-prefix="$instdir" \
-     --with-pear="$instdir/pear"
+    # --enable-cli first appeared in PHP 5.3.0.
+    otheroptions=
+    if [ $VMAJOR -gt 5 -o $VMINOR -ge 3 ]; then
+        otheroptions=$otheroptions --enable-cli
+    fi
+
+    # For PHP 5.4.0+, also build php-fpm.
+    # In PHP 5.3.0, only one SAPI can be built at a time
+    # (and we already build php-cgi, hence a conflict).
+    if [ $VMAJOR -gt 5 -o $VMINOR -ge 4 ]; then
+        otheroptions=$otheroptions --enable-fpm
+    fi
+
+    #Disable PEAR installation (handled separately below).
+    ./configure $configoptions \
+         --prefix="$instdir" \
+         --exec-prefix="$instdir" \
+         --without-pear \
+         --enable-cgi \
+         $otheroptions
 
     if [ $? -gt 0 ]; then
-        echo configure.sh failed. >&2
+        echo "configure failed." >&2
         exit 3
     fi
 else
     echo "Skipping ./configure step"
 fi
 
-
 # Check that no unknown options have been used.
 unknown_options=
 if [ -e "config.status" ]; then
     unknown_options=`sed -ne '/Following unknown configure options were used/,/for available options/p' config.status | sed -n -e '$d' -e '/^$/d' -e '3,$p'`
 fi
-# PHP 5.4 uses a different way to report such problems.
+# PHP 5.4+ uses a different way to report such problems.
 if [ -z "$unknown_options" -a -e "config.log" ]; then
     unknown_options=`sed -n -r -e 's/configure:[^\020]+WARNING: unrecognized options: //p' config.log`
 fi
