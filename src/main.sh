@@ -41,7 +41,9 @@ if [ $# -eq 0 ]; then
     default_versions="$basedir/custom/default-versions.txt"
     if [ -e "$default_versions" ]; then
         while read arg; do
-            if [ "x$arg" != "x" -a "${arg:0:1}" != "#" ]; then
+            # Ignore comments and strip leading/trailing whitespace.
+            arg=`printf "%s\n" "$arg" | sed -e 's/#.*$//' | sed -e 's/\s+$//' | sed -e 's/^\s+//'`
+            if [ "x$arg" != "x" ]; then
                 versions[${#versions[@]}]="$arg"
             fi
         done < "$default_versions"
