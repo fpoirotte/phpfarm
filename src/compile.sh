@@ -198,14 +198,14 @@ if [ $configure -gt $tstamp ]; then
     # --enable-cli first appeared in PHP 5.3.0.
     otheroptions=
     if [ $VMAJOR -gt 5 -o $VMINOR -ge 3 ]; then
-        otheroptions=$otheroptions --enable-cli
+        otheroptions="$otheroptions --enable-cli"
     fi
 
     # For PHP 5.4.0+, also build php-fpm.
     # In PHP 5.3.0, only one SAPI can be built at a time
     # (and we already build php-cgi, hence a conflict).
     if [ $VMAJOR -gt 5 -o $VMINOR -ge 4 ]; then
-        otheroptions=$otheroptions --enable-fpm
+        otheroptions="$otheroptions --enable-fpm"
     fi
 
     #Disable PEAR installation (handled separately below).
