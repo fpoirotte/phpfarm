@@ -250,7 +250,7 @@ fi
 
 if [ $configure -gt $tstamp -o ! -f sapi/cli/php ]; then
     #compile sources
-    make
+    make $MAKE_OPTIONS
     if [ "$?" -gt 0 ]; then
         echo "make failed."
         exit 4

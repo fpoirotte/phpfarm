@@ -260,6 +260,9 @@ It generally looks somewhat like this::
     # required for production during the post-install step.
     5.3.1-prod
 
+Last but not least, you may pass options (e.g. ``-j3``) to the ``make`` program
+by setting the ``MAKE_OPTIONS`` environment variable.
+
 
 Caveats
 -------
