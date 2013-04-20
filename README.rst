@@ -183,10 +183,6 @@ The following flags are currently accepted:
         For this to work, you also need to drop a copy of the
         `install-pear-nozlib.phar`__ archive in the ``bzips/`` folder.
 
-         Users of PHP 5.5.0alpha1 and later may instead prefer `this link`__
-         which includes a more up-to-date version of the ``Archive_Tar``
-         package, as a workaround for `bug #63073`__.
-
 -   ``suhosin`` to apply the Suhosin patch before compiling PHP.
     This patch provides several enhancements to build an hardened PHP binary.
 
@@ -203,7 +199,6 @@ The following flags are currently accepted:
 __  http://pear.php.net/
 __  http://pecl.php.net/
 __  http://pear.php.net/install-pear-nozlib.phar
-__  http://packages.erebot.net/install-pear-nozlib.phar
 __  https://bugs.php.net/bug.php?id=63073
 
 .. warning::
