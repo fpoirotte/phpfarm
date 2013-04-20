@@ -258,7 +258,7 @@ if [ $configure -gt $tstamp -o ! -f sapi/cli/php ]; then
 fi
 
 #install SAPIs, etc.
-make $MAKE_OPTIONS install
+make install
 if [ "$?" -gt 0 ]; then
     echo "make install failed."
     exit 5
