@@ -26,7 +26,7 @@ If a file cannot be found, try to fetch it manually and put it into
 Setup
 -----
 - Check out phpfarm from git:
-  ``git clone git://git.code.sf.net/p/phpfarm/code phpfarm``
+  ``git clone https://github.com/fpoirotte/phpfarm.git phpfarm``
 - ``cd phpfarm/src/``
 - ``./main.sh 5.3.0``
 - PHP gets installed into ``phpfarm/inst/php-$version/``
