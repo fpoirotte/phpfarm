@@ -42,7 +42,7 @@ if [ $# -eq 0 ]; then
     if [ -e "$default_versions" ]; then
         while read arg; do
             # Ignore comments and strip leading/trailing whitespace.
-            arg=`printf "%s\n" "$arg" | sed -e 's/#.*$//' | sed -e 's/\s+$//' | sed -e 's/^\s+//'`
+            arg=`printf "%s\n" "$arg" | sed -e 's/#.*$//;s/\s+$//;s/^\s+//'`
             if [ "x$arg" != "x" ]; then
                 versions[${#versions[@]}]="$arg"
             fi
@@ -86,18 +86,6 @@ if [ $# -eq 0 ]; then
             read remove
             if [ -z "$remove" -o "$remove" = "y" -o "$remove" = "Y" ]; then
                 rm -vfr "$instbasedir/php-$inst_version"
-
-                # Remove other leftover files.
-                rm -vf "$instbasedir/bin/pear-$inst_version"
-                rm -vf "$instbasedir/bin/peardev-$inst_version"
-                rm -vf "$instbasedir/bin/pecl-$inst_version"
-                rm -vf "$instbasedir/bin/phar-$inst_version"
-                rm -vf "$instbasedir/bin/php-$inst_version"
-                rm -vf "$instbasedir/bin/php-cgi-$inst_version"
-                rm -vf "$instbasedir/bin/php-config-$inst_version"
-                rm -vf "$instbasedir/bin/php-fpm-$inst_version"
-                rm -vf "$instbasedir/bin/phpize-$inst_version"
-                rm -vf "$instbasedir/bin/pyrus-$inst_version"
             fi
 
             if [ -e "$basedir/php-$inst_version" ]; then
@@ -109,6 +97,11 @@ if [ $# -eq 0 ]; then
             fi
         fi
     done
+
+    # The removal of obsolete versions
+    # may have left us with broken links.
+    # Remove these here.
+    find -L "$instbasedir/bin" -type l -delete
 fi
 
 exit 0
