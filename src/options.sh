@@ -42,6 +42,6 @@ for suffix in "" "-$vmajor" "-$vmajor.$vminor" "-$vmajor.$vminor.$vpatch"; do
         if [ $tstamp -gt $configure ]; then
             configure=$tstamp
         fi
-        source "$custom" $version $vmajor $vminor $vpatch
+        source "$custom" "$version" "$vmajor" "$vminor" "$vpatch"
     fi
 done
