@@ -109,7 +109,7 @@ if [ ! -d "$srcdir" ]; then
         fi
     fi
     #extract
-    tar xjvf "$srcfile" --show-transformed-names --xform 's#^[^/]*#php-'"$VERSION"'#'
+    tar xjvf "$srcfile" --show-transformed-names --transform 's#^[^/]*#php-'"$VERSION"'#'
 fi
 
 #read customizations
