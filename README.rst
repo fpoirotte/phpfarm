@@ -14,11 +14,6 @@ channels.
 The Pyrus PHAR archive is fetched from http://pear2.php.net/pyrus.phar (which
 always refers the latest version).
 
-Last but not least, phpfarm can automatically apply the Suhosin patch
-for the version of PHP you are installing. It does so by looking at
-http://www.hardened-php.net/suhosin/download.html for compatible versions
-of the patch.
-
 If a file cannot be found, try to fetch it manually and put it into
 ``src/bzips/``.
 
@@ -115,9 +110,9 @@ and pre-install some extensions/packages needed by your project.
 
 Each script is called with three arguments:
 
-- The PHP version that was just installed (eg. ``5.3.1-zts-suhosin-debug``).
+- The PHP version that was just installed (eg. ``5.3.1-zts-debug``).
 - The full path to the folder where that version was install
-  (eg. ``/home/clicky/phpfarm/inst/php-5.3.1-zts-suhosin-debug/``).
+  (eg. ``/home/clicky/phpfarm/inst/php-5.3.1-zts-debug/``).
 - The full path to the shared folder containing the links to the main
   executables for each version (eg. ``/home/clicky/phpfarm/inst/bin/``).
 
@@ -183,13 +178,6 @@ The following flags are currently accepted:
         For this to work, you also need to drop a copy of the
         `install-pear-nozlib.phar`__ archive in the ``bzips/`` folder.
 
--   ``suhosin`` to apply the Suhosin patch before compiling PHP.
-    This patch provides several enhancements to build an hardened PHP binary.
-
-    ..  note::
-        If specified, this flag appears in the final name of the PHP binary
-        (eg. ``php-5.4.13-suhosin``).
-
 -   ``zts`` to enable the Zend Thread Safety mechanisms.
 
     ..  note::
@@ -200,13 +188,6 @@ __  http://pear.php.net/
 __  http://pecl.php.net/
 __  http://pear.php.net/install-pear-nozlib.phar
 __  https://bugs.php.net/bug.php?id=63073
-
-.. warning::
-    The ``suhosin`` flag only applies the Suhosin patch. It does not
-    automatically install the Suhosin extension. If you want to benefit
-    from the whole set of attack mitigation techniques provided by Suhosin,
-    you must also install the Suhosin extension separately (and manually),
-    using a `post-install script`_
 
 For example, to build a thread-safe version of PHP 5.3.1 with debugging
 symbols, use::
@@ -222,7 +203,7 @@ symbols, use::
     The order of the flags in the name of the final binary will always match
     the order in which they are listed above.
     Therefore, a PHP 5.4.13 binary with all the flags applied would be named
-    ``php-5.4.13-32bits-debug-gcov-suhosin-zts``.
+    ``php-5.4.13-32bits-debug-gcov-zts``.
     Future versions of phpfarm will continue to use that same logic whenever
     new flags are added.
 
