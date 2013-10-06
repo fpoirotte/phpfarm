@@ -24,12 +24,13 @@ Setup
   ``git clone https://github.com/fpoirotte/phpfarm.git phpfarm``
 - ``cd phpfarm/src/``
 - ``./main.sh 5.3.0``
-- PHP gets installed into ``phpfarm/inst/php-$version/``
-- ``phpfarm/inst/bin/php-$version`` is also executable
-  You should add ``inst/bin``, ``inst/current/bin`` and
-  ``inst/current/sbin`` to your ``$PATH``, i.e.
-  ``PATH="$PATH:$HOME/phpfarm/inst/bin:$HOME/phpfarm/inst/current/bin:$HOME/phpfarm/inst/current/sbin"``
-  in your ``.bashrc`` or similar file
+- PHP gets installed into ``phpfarm/inst/php-$version/bin/php``
+  and a symbolic link to it is created in ``phpfarm/inst/bin/php-$version``.
+
+You should consider adding ``inst/bin``, ``inst/current/bin`` and
+``inst/current/sbin`` to your ``$PATH``, i.e. append
+``PATH="$PATH:$HOME/phpfarm/inst/bin:$HOME/phpfarm/inst/current/bin:$HOME/phpfarm/inst/current/sbin"``
+to your ``.bashrc`` or similar file.
 
 
 Configure options customization
@@ -45,15 +46,15 @@ You may create version-specific custom option files:
 
 Where:
 
-- ``<major>`` is the major version number (eg. "5" for PHP 5.3.1).
-- ``<minor>`` is the minor version number (eg. "3" for PHP 5.3.1).
-- ``<patch>`` is the patch version number (eg. "1" for PHP 5.3.1).
+- ``<major>`` is the version's major number (eg. "5" for PHP 5.3.1).
+- ``<minor>`` is the version's minor number (eg. "3" for PHP 5.3.1).
+- ``<patch>`` is the version's patch number (eg. "1" for PHP 5.3.1).
 - ``<flag>`` matches the specific compilation/installation flags (if any)
   for that PHP version. See `Special flags in version strings`_
   for information on supported flags. The flags should appear in the exact
   same order as listed in that chapter for this to work.
 
-The shell script needs to define a variable "``$configoptions``" with
+The shell script needs to define a variable named ``$configoptions`` with
 all ``./configure`` options.
 Do not try to change ``prefix`` and ``exec-prefix``.
 
@@ -105,9 +106,9 @@ The final ``php.ini`` configuration file is made from several pieces:
 
   Where:
 
-  - ``<major>`` is the major version number (eg. "5" for PHP 5.3.1).
-  - ``<minor>`` is the minor version number (eg. "3" for PHP 5.3.1).
-  - ``<patch>`` is the patch version number (eg. "1" for PHP 5.3.1).
+  - ``<major>`` is the version's major number (eg. "5" for PHP 5.3.1).
+  - ``<minor>`` is the version's minor number (eg. "3" for PHP 5.3.1).
+  - ``<patch>`` is the version's patch number (eg. "1" for PHP 5.3.1).
   - ``<flag>`` matches the specific compilation/installation flags (if any)
     for that PHP version. See `Special flags in version strings`_
     for information on supported flags. The flags should appear in the exact
@@ -141,9 +142,9 @@ the PHP binary has been successfully compiled, installed and configured:
 
 Where:
 
-- ``<major>`` is the major version number (eg. "5" for PHP 5.3.1).
-- ``<minor>`` is the minor version number (eg. "3" for PHP 5.3.1).
-- ``<patch>`` is the patch version number (eg. "1" for PHP 5.3.1).
+- ``<major>`` is the version's major number (eg. "5" for PHP 5.3.1).
+- ``<minor>`` is the version's minor number (eg. "3" for PHP 5.3.1).
+- ``<patch>`` is the version's patch number (eg. "1" for PHP 5.3.1).
 - ``<flag>`` matches the specific compilation/installation flags (if any)
   for that PHP version. See `Special flags in version strings`_
   for information on supported flags. The flags should appear in the exact
@@ -218,13 +219,13 @@ The following flags are currently accepted:
 
 -   ``pear`` to install the pear/pecl utilities
     (useful if you plan to install packages from the
-    `PHP Extension and Application Repository`__
-    or extensions from the `PHP Extension Community Library`__).
+    `PHP Extension and Application Repository`_
+    or extensions from the `PHP Extension Community Library`_).
 
     ..  note::
 
         For this to work, you also need to drop a copy of the
-        `install-pear-nozlib.phar`__ archive in the ``bzips/`` folder.
+        `install-pear-nozlib.phar`_ archive in the ``bzips/`` folder.
         If specified, this flag **will not** appear in the final name
         of the PHP binary.
 
@@ -235,10 +236,12 @@ The following flags are currently accepted:
         If specified, this flag appears in the final name of the PHP binary
         (eg. ``php-5.4.13-zts``).
 
-__  http://pear.php.net/
-__  http://pecl.php.net/
-__  http://pear.php.net/install-pear-nozlib.phar
-__  https://bugs.php.net/bug.php?id=63073
+..  _`PHP Extension and Application Repository`:
+    http://pear.php.net/
+..  _`PHP Extension Community Library`:
+    http://pecl.php.net/
+..  _`install-pear-nozlib.phar`:
+    http://pear.php.net/install-pear-nozlib.phar
 
 For example, to build a thread-safe version of PHP 5.3.1 with debugging
 symbols, use::
@@ -247,9 +250,9 @@ symbols, use::
 
 ..  note::
 
-    The order in which the flags appear does not matter, phpfarm will
-    reorganize them if needed. Hence, ``5.3.1-zts-debug`` is effectively
-    the same as ``5.3.1-debug-zts``.
+    The order in which the flags appear on the command line does not matter,
+    phpfarm will reorganize them if needed. Hence, ``5.3.1-zts-debug``
+    is effectively the same as ``5.3.1-debug-zts``.
 
 ..  note::
 
@@ -285,8 +288,8 @@ It generally looks somewhat like this::
     # and to report bugs to the PHP folks.
     5.4.0beta1
 
-Last but not least, you may pass options (e.g. ``-j3``) to the ``make`` program
-by setting the ``MAKE_OPTIONS`` environment variable.
+Last but not least, you may pass options to the ``make`` program by setting
+the ``MAKE_OPTIONS`` environment variable (eg. ``MAKE_OPTIONS="-j3"``).
 
 
 Caveats
