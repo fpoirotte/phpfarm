@@ -37,13 +37,14 @@ Configure options customization
 Default configuration options are in ``src/options.sh``.
 You may create version-specific custom option files:
 
-- ``custom/options.sh``
-- ``custom/options-<major>.sh``
-- ``custom/options-<major>.<minor>.sh``
-- ``custom/options-<major>.<minor>.<patch>.sh``
-- ``custom/options-<major>.<minor>.<patch>-<flags>.sh``
+- ``src/custom/options.sh``
+- ``src/custom/options-<major>.sh``
+- ``src/custom/options-<major>.<minor>.sh``
+- ``src/custom/options-<major>.<minor>.<patch>.sh``
+- ``src/custom/options-<major>.<minor>.<patch>-<flags>.sh``
 
 Where:
+
 - ``<major>`` is the major version number (eg. "5" for PHP 5.3.1).
 - ``<minor>`` is the minor version number (eg. "3" for PHP 5.3.1).
 - ``<patch>`` is the patch version number (eg. "1" for PHP 5.3.1).
@@ -95,14 +96,15 @@ The final ``php.ini`` configuration file is made from several pieces:
 - Then, the contents of the files listed below is appended at the end of that
   file to obtain the final configuration file:
 
-  - ``custom/php.ini`` (initialized from a copy of ``default-custom-php.ini``
-    if it does not already exist)
-  - ``custom/php-<major>.ini``
-  - ``custom/php-<major>.<minor>.ini``
-  - ``custom/php-<major>.<minor>.<patch>.ini``
-  - ``custom/php-<major>.<minor>.<patch>-<flags>.ini``
+  - ``src/custom/php.ini`` (initialized from a copy of
+    ``src/default-custom-php.ini`` if it does not already exist)
+  - ``src/custom/php-<major>.ini``
+  - ``src/custom/php-<major>.<minor>.ini``
+  - ``src/custom/php-<major>.<minor>.<patch>.ini``
+  - ``src/custom/php-<major>.<minor>.<patch>-<flags>.ini``
 
   Where:
+
   - ``<major>`` is the major version number (eg. "5" for PHP 5.3.1).
   - ``<minor>`` is the minor version number (eg. "3" for PHP 5.3.1).
   - ``<patch>`` is the patch version number (eg. "1" for PHP 5.3.1).
@@ -131,13 +133,14 @@ Post-install customization
 You may also create version-specific scripts that will be run after
 the PHP binary has been successfully compiled, installed and configured:
 
-- ``custom/post-install.sh``
-- ``custom/post-install-<major>.sh``
-- ``custom/post-install-<major>.<minor>.sh``
-- ``custom/post-install-<major>.<minor>.<patch>.sh``
-- ``custom/post-install-<major>.<minor>.<patch>-<flags>.sh``
+- ``src/custom/post-install.sh``
+- ``src/custom/post-install-<major>.sh``
+- ``src/custom/post-install-<major>.<minor>.sh``
+- ``src/custom/post-install-<major>.<minor>.<patch>.sh``
+- ``src/custom/post-install-<major>.<minor>.<patch>-<flags>.sh``
 
 Where:
+
 - ``<major>`` is the major version number (eg. "5" for PHP 5.3.1).
 - ``<minor>`` is the minor version number (eg. "3" for PHP 5.3.1).
 - ``<patch>`` is the patch version number (eg. "1" for PHP 5.3.1).
@@ -172,7 +175,8 @@ be used to discover a PEAR channel and install a PEAR extension::
     # Any other value will be treated as an error.
     exit 0
 
-.. warning::
+..  warning::
+
     Your post-install customization script should always exit with a zero
     status when they terminate normally. Any other value will be considered
     a failure and will make phpfarm exit immediately with an error.
@@ -191,12 +195,14 @@ The following flags are currently accepted:
     machine.
 
     ..  note::
+
         If specified, this flag appears in the final name of the PHP binary
         (eg. ``php-5.4.13-32bits``).
 
 -   ``debug`` to compile a version with debugging symbols.
 
     ..  note::
+
         If specified, this flag appears in the final name of the PHP binary
         (eg. ``php-5.4.13-debug``).
         On the other hand, if this flag is not specified, the debugging symbols
@@ -206,6 +212,7 @@ The following flags are currently accepted:
 -   ``gcov`` to enable GCOV code coverage information (requires LTP).
 
     ..  note::
+
         If specified, this flag appears in the final name of the PHP binary
         (eg. ``php-5.4.13-gcov``).
 
@@ -215,6 +222,7 @@ The following flags are currently accepted:
     or extensions from the `PHP Extension Community Library`__).
 
     ..  note::
+
         For this to work, you also need to drop a copy of the
         `install-pear-nozlib.phar`__ archive in the ``bzips/`` folder.
         If specified, this flag **will not** appear in the final name
@@ -223,6 +231,7 @@ The following flags are currently accepted:
 -   ``zts`` to enable the Zend Thread Safety mechanisms.
 
     ..  note::
+
         If specified, this flag appears in the final name of the PHP binary
         (eg. ``php-5.4.13-zts``).
 
@@ -237,11 +246,13 @@ symbols, use::
     ./main.sh  5.3.1-zts-debug
 
 ..  note::
+
     The order in which the flags appear does not matter, phpfarm will
     reorganize them if needed. Hence, ``5.3.1-zts-debug`` is effectively
     the same as ``5.3.1-debug-zts``.
 
 ..  note::
+
     The order of the flags in the name of the final binary will always match
     the order in which they are listed above.
     Therefore, a PHP 5.4.13 binary with all the flags applied would be named
@@ -299,9 +310,9 @@ in the future:
     with the original one, a few incompatible changes were made.
     These changes and the rationale behind them are listed below:
 
-    -   Historically, this phpfarm created a symbolic link in the installation
-        folder named ``main`` pointing to the "main PHP version" (the one you
-        would usually add to your ``$PATH``).
+    -   Historically, this version of phpfarm created a symbolic link
+        in the installation folder named ``main`` pointing to the
+        "main PHP version" (the one you would usually add to your ``$PATH``).
         The original phpfarm later added a similar concept with a link named
         ``current-bin`` pointing to the main version's ``bin/`` directory.
 
