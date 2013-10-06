@@ -29,7 +29,7 @@ Setup
   You should add ``inst/bin``, ``inst/current/bin`` and
   ``inst/current/sbin`` to your ``$PATH``, i.e.
   ``PATH="$PATH:$HOME/phpfarm/inst/bin:$HOME/phpfarm/inst/current/bin:$HOME/phpfarm/inst/current/sbin"``
-  in your ``.bashrc``
+  in your ``.bashrc`` or similar file
 
 
 Configure options customization
@@ -38,9 +38,19 @@ Default configuration options are in ``src/options.sh``.
 You may create version-specific custom option files:
 
 - ``custom/options.sh``
-- ``custom/options-5.sh``
-- ``custom/options-5.3.sh``
-- ``custom/options-5.3.1.sh``
+- ``custom/options-<major>.sh``
+- ``custom/options-<major>.<minor>.sh``
+- ``custom/options-<major>.<minor>.<patch>.sh``
+- ``custom/options-<major>.<minor>.<patch>-<flags>.sh``
+
+Where:
+- ``<major>`` is the major version number (eg. "5" for PHP 5.3.1).
+- ``<minor>`` is the minor version number (eg. "3" for PHP 5.3.1).
+- ``<patch>`` is the patch version number (eg. "1" for PHP 5.3.1).
+- ``<flag>`` matches the specific compilation/installation flags (if any)
+  for that PHP version. See `Special flags in version strings`_
+  for information on supported flags. The flags should appear in the exact
+  same order as listed in that chapter for this to work.
 
 The shell script needs to define a variable "``$configoptions``" with
 all ``./configure`` options.
@@ -49,7 +59,11 @@ Do not try to change ``prefix`` and ``exec-prefix``.
 
 Switching default php versions
 ------------------------------
-Using the command ``switch-phpfarm``, you can make one of the installed
+We recommend that you add the ``inst/bin`` directory to your ``$PATH``
+to make the ``switch-phpfarm`` command always available.
+See `Setup`_ for more information on how to configure your ``$PATH``.
+
+Using the ``switch-phpfarm`` command, you can make one of the installed
 PHP versions the default one that gets run when just typing ``php``::
 
     $ switch-phpfarm
@@ -58,9 +72,11 @@ PHP versions the default one that gets run when just typing ``php``::
     * 5.2.17
       5.3.16
       5.4.6
+
     $ switch-phpfarm 5.4.6
     Setting active PHP version to 5.4.6
-    PHP 5.4.6 (cli) (built: Sep 13 2012 11:24:56) (DEBUG)
+    PHP 5.4.6 (cli) (built: Sep 13 2012 11:24:56)
+
     $ switch-phpfarm
     Switch the currently active PHP version of phpfarm
     Available versions:
@@ -68,30 +84,45 @@ PHP versions the default one that gets run when just typing ``php``::
       5.3.16
     * 5.4.6
 
-You need to have ``inst/current-bin`` in your ``$PATH`` to make this work.
-See `Setup`_ for more information on how to configure your ``$PATH``.
-
 
 php.ini customization
 ---------------------
-``php.ini`` values may also be customized:
+The final ``php.ini`` configuration file is made from several pieces:
 
-- ``custom/php.ini``
-- ``custom/php-5.ini``
-- ``custom/php-5.3.ini``
-- ``custom/php-5.3.1.ini``
+- First, the default development configuration (found in ``php.ini-development``
+  for PHP 5.3.0 or later, and ``php.ini-recommended`` in prior versions)
+  gets copied to the location of the final configuration file.
+- Then, the contents of the files listed below is appended at the end of that
+  file to obtain the final configuration file:
+
+  - ``custom/php.ini`` (initialized from a copy of ``default-custom-php.ini``
+    if it does not already exist)
+  - ``custom/php-<major>.ini``
+  - ``custom/php-<major>.<minor>.ini``
+  - ``custom/php-<major>.<minor>.<patch>.ini``
+  - ``custom/php-<major>.<minor>.<patch>-<flags>.ini``
+
+  Where:
+  - ``<major>`` is the major version number (eg. "5" for PHP 5.3.1).
+  - ``<minor>`` is the minor version number (eg. "3" for PHP 5.3.1).
+  - ``<patch>`` is the patch version number (eg. "1" for PHP 5.3.1).
+  - ``<flag>`` matches the specific compilation/installation flags (if any)
+    for that PHP version. See `Special flags in version strings`_
+    for information on supported flags. The flags should appear in the exact
+    same order as listed in that chapter for this to work.
 
 Please note that a few substitutions are done in those files in order
-to generate the final php.ini configuration file. Namely, the following
+to generate the final ``php.ini`` configuration file. Namely, the following
 variables are substitued:
 
 - ``$ext_dir`` gets replaced by the path to the extension directory
   This is mostly used to set the ``extension_dir`` option to the right
   value.
   This is also useful when installing a ``zend_extension`` like
-  Xdebug as ``extension_dir`` is not automatically prepended to the
-  path for those extensions.
-
+  Xdebug as the contents of ``extension_dir`` is not used to locate
+  those extensions.
+- ``$install_dir`` gets replaced by the path to the installation directory
+  of that specific PHP version (eg. ``/home/me/phpfarm/inst/php-5.3.1``).
 
 .. _`post-install script`:
 
@@ -101,9 +132,19 @@ You may also create version-specific scripts that will be run after
 the PHP binary has been successfully compiled, installed and configured:
 
 - ``custom/post-install.sh``
-- ``custom/post-install-5.sh``
-- ``custom/post-install-5.3.sh``
-- ``custom/post-install-5.3.1.sh``
+- ``custom/post-install-<major>.sh``
+- ``custom/post-install-<major>.<minor>.sh``
+- ``custom/post-install-<major>.<minor>.<patch>.sh``
+- ``custom/post-install-<major>.<minor>.<patch>-<flags>.sh``
+
+Where:
+- ``<major>`` is the major version number (eg. "5" for PHP 5.3.1).
+- ``<minor>`` is the minor version number (eg. "3" for PHP 5.3.1).
+- ``<patch>`` is the patch version number (eg. "1" for PHP 5.3.1).
+- ``<flag>`` matches the specific compilation/installation flags (if any)
+  for that PHP version. See `Special flags in version strings`_
+  for information on supported flags. The flags should appear in the exact
+  same order as listed in that chapter for this to work.
 
 These scripts can be used for example to discover PEAR channels
 and pre-install some extensions/packages needed by your project.
@@ -116,9 +157,8 @@ Each script is called with three arguments:
 - The full path to the shared folder containing the links to the main
   executables for each version (eg. ``/home/clicky/phpfarm/inst/bin/``).
 
-.. note::
-    You do not need to specify a "shebang line" (``#!...``) at the beginning
-    of the scripts. Bash will always be used to execute them.
+Please note that a "shebang line" (``#!...``) is not required at the beginning
+of those scripts. Bash will always be used to execute them.
 
 Given all the previous bits of information, the following shell script may
 be used to discover a PEAR channel and install a PEAR extension::
@@ -177,6 +217,8 @@ The following flags are currently accepted:
     ..  note::
         For this to work, you also need to drop a copy of the
         `install-pear-nozlib.phar`__ archive in the ``bzips/`` folder.
+        If specified, this flag **will not** appear in the final name
+        of the PHP binary.
 
 -   ``zts`` to enable the Zend Thread Safety mechanisms.
 
@@ -231,10 +273,6 @@ It generally looks somewhat like this::
     # Beta version used to test for regressions
     # and to report bugs to the PHP folks.
     5.4.0beta1
-
-    # Custom version which installs specific extensions/packages
-    # required for production during the post-install step.
-    5.3.1-prod
 
 Last but not least, you may pass options (e.g. ``-j3``) to the ``make`` program
 by setting the ``MAKE_OPTIONS`` environment variable.
