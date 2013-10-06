@@ -7,8 +7,8 @@
 # - custom/options-5.3.sh
 # - custom/options-5.3.1.sh
 #
-# Don't touch this file here - it would prevent you to just "svn up"
-# your phpfarm source code.
+# Don't touch this file here - it would prevent you from just
+# "svn update"'ing your phpfarm source code.
 
 version=$1
 vmajor=$2
@@ -27,11 +27,20 @@ configoptions="\
 --enable-pcntl \
 --enable-soap \
 --enable-sockets \
---enable-sqlite-utf8 \
 --enable-wddx \
 --enable-zip \
 --with-zlib \
---with-gettext"
+--with-gettext \
+"
+
+# --enable-sqlite-utf8 was removed starting with PHP 5.4.0.
+test $vmajor -eq 5 -a $vminor -lt 4
+if [ $? -eq 0 ]; then
+configoptions="\
+$configoptions \
+--enable-sqlite-utf8 \
+"
+fi
 
 echo $version $vmajor $vminor $vpatch
 
