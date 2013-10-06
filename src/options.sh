@@ -15,7 +15,6 @@ vmajor=$2
 vminor=$3
 vpatch=$4
 
-configure=`stat -c '%Y' "options.sh"`
 configoptions="\
 --disable-short-tags \
 --with-layout=GNU \
@@ -44,7 +43,8 @@ fi
 
 echo $version $vmajor $vminor $vpatch
 
-for suffix in "" "-$vmajor" "-$vmajor.$vminor" "-$vmajor.$vminor.$vpatch"; do
+configure=`stat -c '%Y' "options.sh"`
+for suffix in "" "-$vmajor" "-$vmajor.$vminor" "-$vmajor.$vminor.$vpatch" "-$version"; do
     custom="custom/options$suffix.sh"
     if [ -e "$custom" ]; then
         tstamp=`stat -c '%Y' "$custom"`
