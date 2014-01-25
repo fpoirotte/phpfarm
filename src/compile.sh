@@ -58,16 +58,6 @@ if [ ! -d "$srcdir" ]; then
         echo "$srcfile"
         url="http://museum.php.net/php$VMAJOR/php-$SHORT_VERSION.tar.bz2"
         wget -P "$bzipsdir" "$url"
-        if [ ! -f "$srcfile" ]; then
-            echo "Fetching sources from museum failed"
-            echo $url
-            #museum failed, now we try real download
-            url="http://www.php.net/get/php-$SHORT_VERSION.tar.bz2/from/this/mirror"
-            wget -P "$bzipsdir" -O "$srcfile" "$url"
-        fi
-        if [ ! -s "$srcfile" -a -f "$srcfile" ]; then
-            rm "$srcfile"
-        fi
 
         if [ ! -f "$srcfile" ]; then
             echo "Fetching sources from official download site failed"
@@ -103,6 +93,17 @@ if [ ! -d "$srcdir" ]; then
         fi
 
         if [ ! -f "$srcfile" ]; then
+            echo "Fetching sources from dsp's site failed"
+            echo $url
+            #use Tyrael's RC (5.6.x)
+            url="https://downloads.php.net/tyrael/php-$SHORT_VERSION.tar.bz2"
+            wget -P "$bzipsdir" -O "$srcfile" "$url"
+        fi
+        if [ ! -s "$srcfile" -a -f "$srcfile" ]; then
+            rm "$srcfile"
+        fi
+
+        if [ ! -f "$srcfile" ]; then
             echo "Fetching sources failed:" >&2
             echo $url >&2
             exit 2
@@ -130,6 +131,10 @@ if [ $configure -gt $tstamp ]; then
     echo "(Re-)configuring"
     if [ $DEBUG = 1 ]; then
         configoptions="--enable-debug $configoptions"
+        test $MAJOR -gt 5 -o \( $MAJOR -eq 5 -a $MINOR -ge 6 \)
+        if [[ $? -eq 0 && $configoptions == *--enable-phpdbg* ]]; then
+            configoptions="--enable-phpdbg-debug $configoptions"
+        fi
     fi
     if [ $ZTS = 1 ]; then
         configoptions="--enable-maintainer-zts $configoptions"
@@ -324,15 +329,21 @@ for binary in php php-cgi php-config phpize; do
     fi
 done
 
-#php-fpm
-if [ -f "$instdir/sbin/php-fpm" ]; then
-    ln -fs "$instdir/sbin/php-fpm" "$shbindir/php-fpm-$VERSION"
-fi
+#other optional SAPIs.
+for binary in php-fpm phpdbg; do
+    if [ -f "$instdir/bin/$binary" ]; then
+        ln -fs "$instdir/bin/$binary" "$shbindir/$binary-$VERSION"
+    elif [ -f "$instdir/sbin/$binary" ]; then
+        ln -fs "$instdir/sbin/$binary" "$shbindir/$binary-$VERSION"
+    fi
+done
 
 #strip executables in non-debug builds.
 if [ $DEBUG != 1 ]; then
-    for binary in php php-cgi php-fpm; do
-        strip --strip-unneeded "$shbindir/$binary-$VERSION"
+    for binary in php php-cgi php-fpm phpdbg; do
+        if [ -f "$shbindir/$binary-$VERSION" ]; then
+            strip --strip-unneeded "$shbindir/$binary-$VERSION"
+        fi
     done
 fi
 
