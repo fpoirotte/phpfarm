@@ -131,7 +131,7 @@ if [ $configure -gt $tstamp ]; then
     echo "(Re-)configuring"
     if [ $DEBUG = 1 ]; then
         configoptions="--enable-debug $configoptions"
-        test $MAJOR -gt 5 -o \( $MAJOR -eq 5 -a $MINOR -ge 6 \)
+        test $VMAJOR -gt 5 -o \( $VMAJOR -eq 5 -a $VMINOR -ge 6 \)
         if [[ $? -eq 0 && $configoptions == *--enable-phpdbg* ]]; then
             configoptions="--enable-phpdbg-debug $configoptions"
         fi
