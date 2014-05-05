@@ -134,6 +134,17 @@ if [ -f "config.nice" -a -f "config.status" ]; then
    tstamp=`stat -c '%Y' "config.status"`
 fi
 
+if [ $ARCH32 = 1 ]; then
+    ARCH=i386
+    CFLAGS="$CFLAGS -m32"
+    CXXFLAGS="$CXXFLAGS -m32"
+    LDFLAGS="$LDFLAGS -m32"
+    export ARCH
+    export CFLAGS
+    export CXXFLAGS
+    export LDFLAGS
+fi
+
 echo "Last config. change:   $configure"
 echo "Last ./configure:      $tstamp"
 if [ $configure -gt $tstamp ]; then
@@ -151,16 +162,6 @@ if [ $configure -gt $tstamp ]; then
     fi
     if [ $GCOV = 1 ]; then
         configoptions="--enable-gcov $configoptions"
-    fi
-    if [ $ARCH32 = 1 ]; then
-        ARCH=i386
-        CFLAGS="$CFLAGS -m32"
-        CXXFLAGS="$CXXFLAGS -m32"
-        LDFLAGS="$LDFLAGS -m32"
-        export ARCH
-        export CFLAGS
-        export CXXFLAGS
-        export LDFLAGS
     fi
 
     # --enable-cli first appeared in PHP 5.3.0.
