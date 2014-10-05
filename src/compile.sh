@@ -368,6 +368,15 @@ for binary in pear peardev pecl phar; do
     fi
 done
 
+# Export various variables for use
+# in post-install scripts and such.
+export VERSION
+export VMAJOR
+export VMINOR
+export VPATCH
+export SHORT_VERSION
+export ARCH
+
 cd "$basedir"
 ./pyrus.sh "$VERSION" "$instdir"
 
