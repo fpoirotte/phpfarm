@@ -8,7 +8,7 @@ active=`basename $(readlink "$binlink") 2>/dev/null | sed -e 's/^php-//;s/\./\\\
 if [ "$1" = "" ]; then
     echo Switch the currently active PHP version of phpfarm
     echo Available versions:
-    ls -1d php-*|sed -e 's/^php-//' -e 's/^/  /' -e "s/^  \($active\)\$/* \1/"
+    ls -1dv php-*|sed -e 's/^php-//' -e 's/^/  /' -e "s/^  \($active\)\$/* \1/"
     exit 1
 fi
 
