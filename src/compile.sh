@@ -242,7 +242,7 @@ if [ $PEAR = 1 ]; then
     if [ ! -e "$pearphar" ]; then
         #download PEAR installer
         wget -O "$pearphar" \
-            "http://pear.php.net/install-pear-nozlib.phar"
+            "https://pear.php.net/install-pear-nozlib.phar"
     fi
     if [ ! -e "$pearphar" ]; then
         echo "Please put install-pear-nozlib.phar into bzips/"
