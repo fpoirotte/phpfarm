@@ -53,7 +53,7 @@ shbindir="$instbasedir/bin"
 if [ ! -d "$srcdir" ]; then
     echo 'Source directory does not exist; trying to extract'
     srcfile="$bzipsdir/php-$SHORT_VERSION.tar.bz2"
-    if [ ! -e "$srcfile" ]; then
+    if [ ! -f "$srcfile" ]; then
         echo 'Source file not found:'
         echo "$srcfile"
         url="http://museum.php.net/php$VMAJOR/php-$SHORT_VERSION.tar.bz2"
@@ -62,7 +62,7 @@ if [ ! -d "$srcdir" ]; then
             echo "Fetching sources from museum failed"
             echo $url
             #museum failed, now we try real download
-            url="http://www.php.net/get/php-$SHORT_VERSION.tar.bz2/from/this/mirror"
+            url="https://www.php.net/get/php-$SHORT_VERSION.tar.bz2/from/this/mirror"
             wget -P "$bzipsdir" -O "$srcfile" "$url"
         fi
         if [ ! -s "$srcfile" -a -f "$srcfile" ]; then
