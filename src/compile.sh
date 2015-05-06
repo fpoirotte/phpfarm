@@ -49,6 +49,32 @@ instdir="$instbasedir/php-$VERSION"
 #directory where all bins are symlinked
 shbindir="$instbasedir/bin"
 
+#handle git snapshots
+if [ "$VMAJOR.$VMINOR" = "0.0" ]; then
+    #download the snapshot and store STDERR
+    tmp=`mktemp`
+    trap "rm -f '$tmp'" EXIT
+    url="https://git.php.net/?p=php-src.git;a=snapshot;h=$VPATCH;sf=tgz"
+    LC_ALL=C LANG=C LANGUAGE=C wget --no-host-directories -P "$bzipsdir" -nc \
+                                    --content-disposition "$url"  2>> "$tmp"
+    #retrieve snapshot name
+    srcfile=`cat "$tmp" | grep -P '(^Saving to|already there; not retrieving\.$)' | cut -d"'" -f2`
+
+    #display original STDERR then clean up
+    cat "$tmp" >&2
+    rm -f "$tmp"
+    trap - EXIT
+
+    if [ ! -f "$srcfile" ]; then
+        echo "Fetching sources failed:" >&2
+        echo $url >&2
+        exit 2
+    fi
+
+    #extract
+    tar xzvf "$srcfile" --show-transformed-names --transform 's#^[^/]*#php-'"$VERSION"'#'
+fi
+
 #already extracted?
 if [ ! -d "$srcdir" ]; then
     echo 'Source directory does not exist; trying to extract'
@@ -175,6 +201,15 @@ if [ $configure -gt $tstamp ]; then
     # (and we already build php-cgi, hence a conflict).
     if [ $VMAJOR -gt 5 -o $VMINOR -ge 4 ]; then
         otheroptions="$otheroptions --enable-fpm"
+    fi
+
+    # Rebuild missing "./configure" (git snapshots)
+    if [ ! -f "./configure" ]; then
+        if [ $DEBUG -eq 1 ]; then
+            ./buildconf --debug
+        else
+            ./buildconf
+        fi
     fi
 
     #Disable PEAR installation (handled separately below).
