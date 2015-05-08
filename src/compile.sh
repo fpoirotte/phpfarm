@@ -251,19 +251,31 @@ if [ $PEAR = 1 ]; then
 
     echo "Installing PEAR environment:     $instdir/pear/"
     mkdir -p "$instdir/pear/php"
-    sapi/cli/php -n                 \
-        -ddisplay_startup_errors=0  \
-        -dextension_dir="$ext_dir"  \
-        -dextension=phar.so         \
-        -dextension=xml.so          \
-        -dextension=pcre.so         \
-        -dshort_open_tag=0          \
-        -dsafe_mode=0               \
-        -dopen_basedir=             \
-        -derror_reporting=1803      \
-        -dmemory_limit=-1           \
-        -ddetect_unicode=0          \
-        "$pearphar"                 \
+
+    #use local modules
+    pear_ext_dir="`pwd`/modules"
+
+    #take care of static vs. dynamic modules
+    pear_exts=""
+    for ext in phar xml pcre; do
+        if [ -f "$pear_ext_dir/$ext.so" ]; then
+            pear_exts=" -dextension=$ext.so"
+        fi
+    done
+
+    #proceed with the installation
+    sapi/cli/php -n                     \
+        -ddisplay_startup_errors=0      \
+        -dauto_prepend_file=../ereg.php \
+        -dextension_dir="$pear_ext_dir" \
+        $pear_exts                      \
+        -dshort_open_tag=0              \
+        -dsafe_mode=0                   \
+        -dopen_basedir=                 \
+        -derror_reporting=1803          \
+        -dmemory_limit=-1               \
+        -ddetect_unicode=0              \
+        "$pearphar"                     \
             -dp         "a"                         \
             -ds         "-$VERSION"                 \
             --dir       "$instdir/pear/php"         \
