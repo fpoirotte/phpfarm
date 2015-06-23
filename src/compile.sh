@@ -98,19 +98,8 @@ if [ ! -d "$srcdir" ]; then
         if [ ! -f "$srcfile" ]; then
             echo "Fetching sources from official download site failed"
             echo $url
-            #use ilia's RC (5.3.x)
-            url="https://downloads.php.net/ilia/php-$SHORT_VERSION.tar.bz2"
-            wget -P "$bzipsdir" -O "$srcfile" "$url"
-        fi
-        if [ ! -s "$srcfile" -a -f "$srcfile" ]; then
-            rm "$srcfile"
-        fi
-
-        if [ ! -f "$srcfile" ]; then
-            echo "Fetching sources from ilia's site failed"
-            echo $url
             #use stas's RC (5.4.x)
-            url="https://downloads.php.net/stas/php-$SHORT_VERSION.tar.bz2"
+            url="https://downloads.php.net/~stas/php-$SHORT_VERSION.tar.bz2"
             wget -P "$bzipsdir" -O "$srcfile" "$url"
         fi
         if [ ! -s "$srcfile" -a -f "$srcfile" ]; then
@@ -120,8 +109,8 @@ if [ ! -d "$srcdir" ]; then
         if [ ! -f "$srcfile" ]; then
             echo "Fetching sources from stas's site failed"
             echo $url
-            #use dsp's RC (5.5.x)
-            url="https://downloads.php.net/dsp/php-$SHORT_VERSION.tar.bz2"
+            #use tyrael's RC (5.6.x)
+            url="https://downloads.php.net/~tyrael/php-$SHORT_VERSION.tar.bz2"
             wget -P "$bzipsdir" -O "$srcfile" "$url"
         fi
         if [ ! -s "$srcfile" -a -f "$srcfile" ]; then
@@ -129,10 +118,10 @@ if [ ! -d "$srcdir" ]; then
         fi
 
         if [ ! -f "$srcfile" ]; then
-            echo "Fetching sources from dsp's site failed"
+            echo "Fetching sources from tyrael's site failed"
             echo $url
-            #use Tyrael's RC (5.6.x)
-            url="https://downloads.php.net/tyrael/php-$SHORT_VERSION.tar.bz2"
+            #use ab's RC (7.0.x)
+            url="https://downloads.php.net/~ab/php-$SHORT_VERSION.tar.bz2"
             wget -P "$bzipsdir" -O "$srcfile" "$url"
         fi
         if [ ! -s "$srcfile" -a -f "$srcfile" ]; then
