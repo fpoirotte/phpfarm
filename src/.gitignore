@@ -2,11 +2,15 @@
 php-*/
 
 # Various source archives for PHP (release, git snapshots),
-# Pyrus, PEAR, and Suhosin.
+# Pyrus, PEAR and Suhosin. Also takes care of GPG signatures.
 bzips/*.bz2
 bzips/*.tar.gz
 bzips/*.phar
 bzips/*.patch.gz
+bzips/*.asc
 
 # Customizations.
 custom/*
+
+# GPG artefacts
+php.gpg~
