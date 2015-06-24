@@ -75,65 +75,71 @@ if [ "$VMAJOR.$VMINOR" = "0.0" ]; then
     tar xzvf "$srcfile" --show-transformed-names --transform 's#^[^/]*#php-'"$VERSION"'#'
 fi
 
+sources=(
+    "http://museum.php.net/php$VMAJOR/php-$SHORT_VERSION.tar.bz2"
+    "http://www.php.net/get/php-$SHORT_VERSION.tar.bz2/from/this/mirror"
+    "https://downloads.php.net/~stas/php-$SHORT_VERSION.tar.bz2"
+    "https://downloads.php.net/~tyrael/php-$SHORT_VERSION.tar.bz2"
+    "https://downloads.php.net/~ab/php-$SHORT_VERSION.tar.bz2"
+)
+
 #already extracted?
 if [ ! -d "$srcdir" ]; then
     echo 'Source directory does not exist; trying to extract'
     srcfile="$bzipsdir/php-$SHORT_VERSION.tar.bz2"
+    sigfile="$bzipsdir/php-$SHORT_VERSION.tar.bz2.asc"
     if [ ! -f "$srcfile" ]; then
-        echo 'Source file not found:'
-        echo "$srcfile"
-        url="http://museum.php.net/php$VMAJOR/php-$SHORT_VERSION.tar.bz2"
-        wget -P "$bzipsdir" "$url"
-        if [ ! -f "$srcfile" ]; then
-            echo "Fetching sources from museum failed"
-            echo $url
-            #museum failed, now we try real download
-            url="http://www.php.net/get/php-$SHORT_VERSION.tar.bz2/from/this/mirror"
-            wget -P "$bzipsdir" -O "$srcfile" "$url"
-        fi
-        if [ ! -s "$srcfile" -a -f "$srcfile" ]; then
-            rm "$srcfile"
+        # Check for GPG existence.
+        gpg=`which gpg`
+        if [ $? -ne 0 ]; then
+            gpg=
         fi
 
-        if [ ! -f "$srcfile" ]; then
-            echo "Fetching sources from official download site failed"
+        echo "Source file not found ($srcfile). Downloading now..."
+        for url in "${sources[@]}"; do
             echo $url
-            #use stas's RC (5.4.x)
-            url="https://downloads.php.net/~stas/php-$SHORT_VERSION.tar.bz2"
             wget -P "$bzipsdir" -O "$srcfile" "$url"
-        fi
-        if [ ! -s "$srcfile" -a -f "$srcfile" ]; then
-            rm "$srcfile"
-        fi
+
+            if [ ! -s "$srcfile" -a -f "$srcfile" ]; then
+                rm -f "$srcfile"
+            fi
+
+            if [ ! -f "$srcfile" ]; then
+                echo "Fetching sources from $url failed"
+            elif [ ! -f "$sigfile" ]; then
+                echo "Downloading the signature..."
+                wget -P "$bzipsdir" -O "$sigfile" "${url/.tar.bz2/.tar.bz2.asc}"
+
+                if [ ! -s "$sigfile" -a -f "$sigfile" ]; then
+                    rm -f "$sigfile"
+                fi
+            fi
+
+            if [ -f "$srcfile" ]; then
+                break
+            fi
+        done
 
         if [ ! -f "$srcfile" ]; then
-            echo "Fetching sources from stas's site failed"
-            echo $url
-            #use tyrael's RC (5.6.x)
-            url="https://downloads.php.net/~tyrael/php-$SHORT_VERSION.tar.bz2"
-            wget -P "$bzipsdir" -O "$srcfile" "$url"
-        fi
-        if [ ! -s "$srcfile" -a -f "$srcfile" ]; then
-            rm "$srcfile"
-        fi
-
-        if [ ! -f "$srcfile" ]; then
-            echo "Fetching sources from tyrael's site failed"
-            echo $url
-            #use ab's RC (7.0.x)
-            url="https://downloads.php.net/~ab/php-$SHORT_VERSION.tar.bz2"
-            wget -P "$bzipsdir" -O "$srcfile" "$url"
-        fi
-        if [ ! -s "$srcfile" -a -f "$srcfile" ]; then
-            rm "$srcfile"
-        fi
-
-        if [ ! -f "$srcfile" ]; then
-            echo "Fetching sources failed:" >&2
+            echo "ERROR: fetching sources failed:" >&2
             echo $url >&2
             exit 2
         fi
+
+        if [ ! -f "$sigfile" ]; then
+            echo "WARNING: no signature available!" >&2
+        elif [ -z "$gpg" ]; then
+            echo "WARNING: gpg not found; signature will not be verified" >&2
+        else
+            "$gpg" --verify --no-default-keyring --keyring ./php.gpg "$sigfile"
+            if [ $? -ne 0 ]; then
+                echo "ERROR: invalid signature" >&2
+                rm -f "$srcfile" "$sigfile"
+                exit 2
+            fi
+        fi
     fi
+
     #extract
     tar xjvf "$srcfile" --show-transformed-names --transform 's#^[^/]*#php-'"$VERSION"'#'
 fi
