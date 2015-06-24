@@ -305,6 +305,9 @@ if [ $PEAR = 1 ]; then
         -derror_reporting=1803          \
         -dmemory_limit=-1               \
         -ddetect_unicode=0              \
+        -dmagic_quotes_gpc=Off          \
+        -dmagic_quotes_runtime=Off      \
+        -dmagic_quotes_sybase=Off       \
         "$pearphar"                     \
             -dp         "a"                         \
             -ds         "-$VERSION"                 \
