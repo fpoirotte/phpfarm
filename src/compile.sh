@@ -62,7 +62,7 @@ if [ ! -d "$srcdir" ]; then
             echo "Fetching sources from museum failed"
             echo $url
             #museum failed, now we try real download
-            url="https://www.php.net/get/php-$SHORT_VERSION.tar.bz2/from/this/mirror"
+            url="https://php.net/get/php-$SHORT_VERSION.tar.bz2/from/this/mirror"
             wget -P "$bzipsdir" -O "$srcfile" "$url"
         fi
         if [ ! -s "$srcfile" -a -f "$srcfile" ]; then
