@@ -144,6 +144,18 @@ if [ ! -d "$srcdir" ]; then
     tar xjvf "$srcfile" --show-transformed-names --transform 's#^[^/]*#php-'"$VERSION"'#'
 fi
 
+ARCH=
+if [ $ARCH32 = 1 ]; then
+    ARCH=i386
+    CFLAGS="$CFLAGS -m32"
+    CXXFLAGS="$CXXFLAGS -m32"
+    LDFLAGS="$LDFLAGS -m32"
+    export CFLAGS
+    export CXXFLAGS
+    export LDFLAGS
+fi
+export ARCH
+
 #read customizations
 source 'options.sh' "$VERSION" "$VMAJOR" "$VMINOR" "$VPATCH"
 cd "$srcdir"
@@ -153,17 +165,6 @@ cd "$srcdir"
 tstamp=0
 if [ -f "config.nice" -a -f "config.status" ]; then
    tstamp=`stat -c '%Y' "config.status"`
-fi
-
-if [ $ARCH32 = 1 ]; then
-    ARCH=i386
-    CFLAGS="$CFLAGS -m32"
-    CXXFLAGS="$CXXFLAGS -m32"
-    LDFLAGS="$LDFLAGS -m32"
-    export ARCH
-    export CFLAGS
-    export CXXFLAGS
-    export LDFLAGS
 fi
 
 echo "Last config. change:   $configure"
