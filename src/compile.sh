@@ -296,7 +296,6 @@ if [ $PEAR = 1 ]; then
     #proceed with the installation
     sapi/cli/php -n                     \
         -ddisplay_startup_errors=0      \
-        -dauto_prepend_file=../ereg.php \
         -dextension_dir="$pear_ext_dir" \
         $pear_exts                      \
         -dshort_open_tag=0              \
