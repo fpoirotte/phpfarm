@@ -135,7 +135,8 @@ if [ ! -d "$srcdir" ]; then
         else
             "$gpg" --verify --no-default-keyring --keyring ./php.gpg "$sigfile"
             if [ $? -ne 0 ]; then
-                echo "ERROR: invalid signature" >&2
+                echo "ERROR: invalid signature. This release may have been tampered with." >&2
+                echo "ERROR: See http://php.net/gpg-keys.php for more information on GPG signatures." >&2
                 rm -f "$srcfile" "$sigfile"
                 exit 2
             fi
