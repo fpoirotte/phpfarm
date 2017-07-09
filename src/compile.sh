@@ -84,6 +84,7 @@ sources=(
     "https://downloads.php.net/~krakjoe/php-$SHORT_VERSION.tar.bz2"
     "https://downloads.php.net/~davey/php-$SHORT_VERSION.tar.bz2"
     "https://downloads.php.net/~pollita/php-$SHORT_VERSION.tar.bz2"
+    "https://downloads.php.net/~remi/php-$SHORT_VERSION.tar.bz2"
 )
 
 #already extracted?
