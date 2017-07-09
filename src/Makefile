@@ -18,5 +18,11 @@ switch:
 	test -n $(VERSION)
 	../inst/bin/switch-phpfarm $(VERSION)
 
+key-%:
+	wget -O- 'https://pgp.mit.edu/pks/lookup?op=get&search=0x$*' | \
+		gpg --no-default-keyring --primary-keyring ./php.gpg --import -
 
-.PHONY: all clean switch
+keys:
+	gpg --no-default-keyring --primary-keyring ./php.gpg --list-keys
+
+.PHONY: all clean switch keys
