@@ -153,16 +153,23 @@ fi
 CFLAGS="$CFLAGS -D_GNU_SOURCE"
 
 ARCH=
+PKG_CONFIG=
 if [ $ARCH32 = 1 ]; then
     ARCH=i386
     CFLAGS="$CFLAGS -m32"
     CXXFLAGS="$CXXFLAGS -m32"
     LDFLAGS="$LDFLAGS -m32"
+    PKG_CONFIG=`which i686-linux-gnu-pkg-config 2> /dev/null`
 fi
 export CFLAGS
 export CXXFLAGS
 export LDFLAGS
 export ARCH
+if [ -n "$PKG_CONFIG" ]; then
+    export PKG_CONFIG
+else
+    export -n PKG_CONFIG
+fi
 
 #read customizations
 source 'options.sh' "$VERSION" "$VMAJOR" "$VMINOR" "$VPATCH"
@@ -193,6 +200,9 @@ if [ $configure -gt $tstamp ]; then
     if [ $GCOV = 1 ]; then
         configoptions="--enable-gcov $configoptions"
     fi
+   if [ $ARCH32 = 1 ]; then
+       configoptions="--host=i686-pc-linux-gnu"
+   fi
 
     # --enable-cli first appeared in PHP 5.3.0.
     otheroptions=
