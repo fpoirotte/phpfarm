@@ -185,6 +185,9 @@ fi
 echo "Last config. change:   $configure"
 echo "Last ./configure:      $tstamp"
 if [ $configure -gt $tstamp ]; then
+    echo "Cleaning potential leftover files from previous builds"
+    make distclean 2> /dev/null
+
     #configuring
     echo "(Re-)configuring"
     configoptions="--with-config-file-path=$instdir/etc/ --with-config-file-scan-dir=$instdir/etc/php.d/ $configoptions"
