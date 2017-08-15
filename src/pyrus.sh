@@ -53,5 +53,5 @@ chmod +x "$pyrusbin"
 "$pyrusbin" set php_prefix "$instdir/bin/"
 
 #symlink
-ln -sf "$pyrusbin" "$instdir/../bin/pyrus-$version"
+ln -sfT "../php-$version/bin/pyrus" "$instdir/../bin/pyrus-$version"
 exit 0

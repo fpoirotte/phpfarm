@@ -187,6 +187,8 @@ echo "Last ./configure:      $tstamp"
 if [ $configure -gt $tstamp ]; then
     #configuring
     echo "(Re-)configuring"
+    configoptions="--with-config-file-path=$instdir/etc/ --with-config-file-scan-dir=$instdir/etc/php.d/ $configoptions"
+
     if [ $DEBUG = 1 ]; then
         configoptions="--enable-debug $configoptions"
         test $VMAJOR -gt 5 -o \( $VMAJOR -eq 5 -a $VMINOR -ge 6 \)
@@ -200,9 +202,9 @@ if [ $configure -gt $tstamp ]; then
     if [ $GCOV = 1 ]; then
         configoptions="--enable-gcov $configoptions"
     fi
-   if [ $ARCH32 = 1 ]; then
-       configoptions="--host=i686-pc-linux-gnu"
-   fi
+    if [ $ARCH32 = 1 ]; then
+        configoptions="--host=i686-pc-linux-gnu"
+    fi
 
     # --enable-cli first appeared in PHP 5.3.0.
     otheroptions=
@@ -284,6 +286,10 @@ fi
 
 #determine path to extension directory
 ext_dir=`"$instdir/bin/php-config" --extension-dir`
+#make the path relative to the "inst" folder
+rel_ext_dir="${ext_dir/$instbasedir}"
+rel_ext_dir="${rel_ext_dir/\/}"
+rel_ext_dir="${rel_ext_dir/php-$VERSION\/}"
 
 #install PEAR separately
 if [ $PEAR = 1 ]; then
@@ -346,9 +352,11 @@ if [ $PEAR = 1 ]; then
 
     #add symlink to extension directory as "ext"
     #for compatibility with Pyrus.
-    ln -sfT "$ext_dir" "$instdir/pear/ext"
-    #add a symlink to PEAR's cfg_dir for convenience.
-    ln -sfT "$instdir/pear/cfg" "$instdir/etc/pear"
+    ln -sfT "../$rel_ext_dir" "$instdir/pear/ext"
+    #create PEAR's cfg_dir (not always done automatically)
+    mkdir -p "$instdir/pear/cfg"
+    #add symlink to PEAR's cfg_dir for convenience.
+    ln -sfT "../pear/cfg" "$instdir/etc/pear"
 fi
 
 #copy php.ini
@@ -356,7 +364,7 @@ fi
 if [ "x$initarget" = x ]; then
     initarget="$instdir/etc/php.ini"
 fi
-mkdir -p `dirname "$initarget"`
+mkdir -p `dirname "$initarget"`/php.d
 if [ -f "php.ini-development" ]; then
     #php 5.3
     cp "php.ini-development" "$initarget"
@@ -388,15 +396,15 @@ if [ ! -d "$shbindir" ]; then
     echo "Cannot create shared bin dir" >&2
     exit 6
 fi
-#symlink all files
 
+#symlink the binary files
 #php may be called php.gcno
 #same for php-cgi.
 for binary in php php-cgi php-config phpize; do
     if [ -f "$instdir/bin/$binary" ]; then
-        ln -fs "$instdir/bin/$binary" "$shbindir/$binary-$VERSION"
+        ln -fsT "../php-$VERSION/bin/$binary" "$shbindir/$binary-$VERSION"
     elif [ -f "$instdir/bin/$binary.gcno" ]; then
-        ln -fs "$instdir/bin/$binary.gcno" "$shbindir/$binary-$VERSION"
+        ln -fsT "../php-$VERSION/bin/$binary.gcno" "$shbindir/$binary-$VERSION"
     else
         echo "no $binary found" >&2
         exit 7
@@ -406,9 +414,9 @@ done
 #other optional SAPIs.
 for binary in php-fpm phpdbg; do
     if [ -f "$instdir/bin/$binary" ]; then
-        ln -fs "$instdir/bin/$binary" "$shbindir/$binary-$VERSION"
+        ln -fsT "../php-$VERSION/bin/$binary" "$shbindir/$binary-$VERSION"
     elif [ -f "$instdir/sbin/$binary" ]; then
-        ln -fs "$instdir/sbin/$binary" "$shbindir/$binary-$VERSION"
+        ln -fsT "../php-$VERSION/sbin/$binary" "$shbindir/$binary-$VERSION"
     fi
 done
 
@@ -427,9 +435,14 @@ fi
 # Let's be user-friendly and add symlinks to all these tools.
 for binary in pear peardev pecl phar; do
     if [ -e "$instdir/bin/$binary" ]; then
-        ln -fs "$instdir/bin/$binary" "$shbindir/$binary-$VERSION"
+        ln -fsT "../php-$VERSION/bin/$binary" "$shbindir/$binary-$VERSION"
     fi
 done
+
+#replace absolute link to phar.phar with a relative one
+if [ -e "$instdir/bin/phar" ]; then
+    ln -fsT "phar.phar" "$instdir/bin/phar"
+fi
 
 # Export various variables for use
 # in post-install scripts and such.
