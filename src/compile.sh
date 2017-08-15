@@ -206,7 +206,7 @@ if [ $configure -gt $tstamp ]; then
         configoptions="--enable-gcov $configoptions"
     fi
     if [ $ARCH32 = 1 ]; then
-        configoptions="--host=i686-pc-linux-gnu"
+        configoptions="--host=i686-pc-linux-gnu $configoptions"
     fi
 
     # --enable-cli first appeared in PHP 5.3.0.
