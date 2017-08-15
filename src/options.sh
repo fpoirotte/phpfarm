@@ -46,6 +46,7 @@ echo $version $vmajor $vminor $vpatch
 configure=`stat -c '%Y' "options.sh"`
 for suffix in "" "-$vmajor" "-$vmajor.$vminor" "-$vmajor.$vminor.$vpatch" "-$version"; do
     custom="custom/options$suffix.sh"
+    printf "Parsing '%s' ...\n" "$custom"
     if [ -e "$custom" ]; then
         tstamp=`stat -c '%Y' "$custom"`
         if [ $tstamp -gt $configure ]; then
