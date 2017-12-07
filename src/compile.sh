@@ -246,7 +246,7 @@ if [ $configure -gt $tstamp ]; then
     #Disable PEAR installation (handled separately below).
     ./configure $configoptions \
          --prefix="$instdir" \
-         --exec-prefix="$instdir" \
+         --exec-prefix='${prefix}' \
          --without-pear \
          --enable-cgi \
          $otheroptions
@@ -282,6 +282,10 @@ if [ -n "$unknown_options" ]; then
     echo "Please fix your configure options and try again." >&2
     exit 3
 fi
+
+# Patch "phpize" & "php-config" to use relative paths in "prefix" / "exec_prefix"
+sed -ri -e 's~^((exec_)?prefix)=.*$~\1="$(dirname "$(dirname "$(realpath "$0")")")"~' \
+        "scripts/phpize.in" "scripts/php-config.in"
 
 if [ $configure -gt $tstamp -o ! -f sapi/cli/php ]; then
     #compile sources
@@ -415,11 +419,26 @@ fi
 #symlink the binary files
 #php may be called php.gcno
 #same for php-cgi.
-for binary in php php-cgi php-config phpize; do
+for binary in php php-cgi phpize; do
     if [ -f "$instdir/bin/$binary" ]; then
         ln -fsT "../php-$VERSION/bin/$binary" "$shbindir/$binary-$VERSION"
     elif [ -f "$instdir/bin/$binary.gcno" ]; then
         ln -fsT "../php-$VERSION/bin/$binary.gcno" "$shbindir/$binary-$VERSION"
+    else
+        echo "no $binary found" >&2
+        exit 7
+    fi
+done
+
+for binary in php-config; do
+    if [ -f "$instdir/bin/$binary" ]; then
+        ln -fsT "../php-$VERSION/bin/$binary" "$shbindir/$binary-$VERSION"
+        orig_prefix=`"$instdir/bin/$binary" --prefix`
+        orig_extdir=`"$instdir/bin/$binary" --extension-dir`
+        # Use dynamic paths for "extension_dir" and "configure_options"
+        sed -ri -e 's~^extension_dir=.*$~extension_dir="${prefix}'"${orig_extdir#$orig_prefix}"'"~' \
+                -e "/^configure_options=/s~$instdir~"'${prefix}~g' \
+                "$instdir/bin/$binary"
     else
         echo "no $binary found" >&2
         exit 7

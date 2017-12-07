@@ -47,8 +47,9 @@ chmod +x "$pyrustarget"
 mkdir -p "$instdir/pear"
 
 pyrusbin="$instdir/bin/pyrus"
-echo '#!/bin/sh'> "$pyrusbin"
-echo "\"$instdir/bin/php\" -d detect_unicode=0 \"$pyrustarget\" \"$instdir/pear\" \"\$@\"" >> "$pyrusbin"
+echo '#!/bin/sh' > "$pyrusbin"
+echo 'prefix="$(dirname "$(dirname "$(realpath "$0")")")"' > "$pyrusbin"
+echo '"$prefix/bin/php" -d detect_unicode=0 "$prefix/pyrus.phar" "$prefix/pear" "$@"' >> "$pyrusbin"
 chmod +x "$pyrusbin"
 "$pyrusbin" set php_prefix "$instdir/bin/"
 
