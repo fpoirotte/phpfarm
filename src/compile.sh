@@ -467,6 +467,7 @@ export VMINOR
 export VPATCH
 export SHORT_VERSION
 export ARCH
+export PEAR
 
 cd "$basedir"
 ./pyrus.sh "$VERSION" "$instdir"
