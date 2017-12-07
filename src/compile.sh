@@ -160,10 +160,22 @@ if [ $ARCH32 = 1 ]; then
     CXXFLAGS="$CXXFLAGS -m32"
     LDFLAGS="$LDFLAGS -m32"
     PKG_CONFIG=`which i686-linux-gnu-pkg-config 2> /dev/null`
+    if [ -n "$CC" ]; then
+        CC="$CC -m32"
+    else
+        CC="cc -m32"
+    fi
+    if [ -n "$CXX" ]; then
+        CXX="$CXX -m32"
+    else
+        CXX="c++ -m32"
+    fi
 fi
 export CFLAGS
 export CXXFLAGS
 export LDFLAGS
+export CC
+export CXX
 export ARCH
 if [ -n "$PKG_CONFIG" ]; then
     export PKG_CONFIG
