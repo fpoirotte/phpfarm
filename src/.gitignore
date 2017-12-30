@@ -1,14 +1,16 @@
 # Compilation directories for the various PHP versions.
 php-*/
 
-# Source archives for PHP.
+# Various source archives for PHP (release, git snapshots),
+# Pyrus, PEAR and Suhosin. Also takes care of GPG signatures.
 bzips/*.bz2
-
-# Source archive for Pyrus.
+bzips/*.tar.gz
 bzips/*.phar
-
-# Source archives for Suhosin.
 bzips/*.patch.gz
+bzips/*.asc
 
 # Customizations.
 custom/*
+
+# GPG artefacts
+php.gpg~

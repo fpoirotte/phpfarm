@@ -49,78 +49,138 @@ instdir="$instbasedir/php-$VERSION"
 #directory where all bins are symlinked
 shbindir="$instbasedir/bin"
 
+#handle git snapshots
+if [ "$VMAJOR.$VMINOR" = "0.0" ]; then
+    #download the snapshot and store STDERR
+    tmp=`mktemp`
+    trap "rm -f '$tmp'" EXIT
+    url="https://git.php.net/?p=php-src.git;a=snapshot;h=$VPATCH;sf=tgz"
+    LC_ALL=C LANG=C LANGUAGE=C wget --no-host-directories -P "$bzipsdir" -nc \
+                                    --content-disposition "$url"  2>> "$tmp"
+    #retrieve snapshot name
+    srcfile=`cat "$tmp" | grep -P '(^Saving to|already there; not retrieving\.$)' | cut -d"'" -f2`
+
+    #display original STDERR then clean up
+    cat "$tmp" >&2
+    rm -f "$tmp"
+    trap - EXIT
+
+    if [ ! -f "$srcfile" ]; then
+        echo "Fetching sources failed:" >&2
+        echo $url >&2
+        exit 2
+    fi
+
+    #extract
+    tar xzvf "$srcfile" --show-transformed-names --transform 's#^[^/]*#php-'"$VERSION"'#'
+fi
+
+sources=(
+    "http://museum.php.net/php$VMAJOR/php-$SHORT_VERSION.tar.bz2"
+    "http://www.php.net/get/php-$SHORT_VERSION.tar.bz2/from/this/mirror"
+    "https://downloads.php.net/~stas/php-$SHORT_VERSION.tar.bz2"
+    "https://downloads.php.net/~tyrael/php-$SHORT_VERSION.tar.bz2"
+    "https://downloads.php.net/~ab/php-$SHORT_VERSION.tar.bz2"
+    "https://downloads.php.net/~krakjoe/php-$SHORT_VERSION.tar.bz2"
+    "https://downloads.php.net/~davey/php-$SHORT_VERSION.tar.bz2"
+    "https://downloads.php.net/~pollita/php-$SHORT_VERSION.tar.bz2"
+    "https://downloads.php.net/~remi/php-$SHORT_VERSION.tar.bz2"
+)
+
 #already extracted?
 if [ ! -d "$srcdir" ]; then
     echo 'Source directory does not exist; trying to extract'
     srcfile="$bzipsdir/php-$SHORT_VERSION.tar.bz2"
+    sigfile="$bzipsdir/php-$SHORT_VERSION.tar.bz2.asc"
     if [ ! -f "$srcfile" ]; then
-        echo 'Source file not found:'
-        echo "$srcfile"
-        url="http://museum.php.net/php$VMAJOR/php-$SHORT_VERSION.tar.bz2"
-        wget -P "$bzipsdir" "$url"
-        if [ ! -f "$srcfile" ]; then
-            echo "Fetching sources from museum failed"
-            echo $url
-            #museum failed, now we try real download
-            url="https://www.php.net/get/php-$SHORT_VERSION.tar.bz2/from/this/mirror"
-            wget -P "$bzipsdir" -O "$srcfile" "$url"
-        fi
-        if [ ! -s "$srcfile" -a -f "$srcfile" ]; then
-            rm "$srcfile"
+        # Check for GPG existence.
+        gpg=`which gpg`
+        if [ $? -ne 0 ]; then
+            gpg=
         fi
 
-        if [ ! -f "$srcfile" ]; then
-            echo "Fetching sources from official download site failed"
+        echo "Source file not found ($srcfile). Downloading now..."
+        for url in "${sources[@]}"; do
             echo $url
-            #use ilia's RC (5.3.x)
-            url="https://downloads.php.net/ilia/php-$SHORT_VERSION.tar.bz2"
             wget -P "$bzipsdir" -O "$srcfile" "$url"
-        fi
-        if [ ! -s "$srcfile" -a -f "$srcfile" ]; then
-            rm "$srcfile"
-        fi
+
+            if [ ! -s "$srcfile" -a -f "$srcfile" ]; then
+                rm -f "$srcfile"
+            fi
+
+            if [ ! -f "$srcfile" ]; then
+                echo "Fetching sources from $url failed"
+            elif [ ! -f "$sigfile" ]; then
+                echo "Downloading the signature..."
+                wget -P "$bzipsdir" -O "$sigfile" "${url/.tar.bz2/.tar.bz2.asc}"
+
+                if [ ! -s "$sigfile" -a -f "$sigfile" ]; then
+                    rm -f "$sigfile"
+                fi
+            fi
+
+            if [ -f "$srcfile" ]; then
+                break
+            fi
+        done
 
         if [ ! -f "$srcfile" ]; then
-            echo "Fetching sources from ilia's site failed"
-            echo $url
-            #use stas's RC (5.4.x)
-            url="https://downloads.php.net/stas/php-$SHORT_VERSION.tar.bz2"
-            wget -P "$bzipsdir" -O "$srcfile" "$url"
-        fi
-        if [ ! -s "$srcfile" -a -f "$srcfile" ]; then
-            rm "$srcfile"
-        fi
-
-        if [ ! -f "$srcfile" ]; then
-            echo "Fetching sources from stas's site failed"
-            echo $url
-            #use dsp's RC (5.5.x)
-            url="https://downloads.php.net/dsp/php-$SHORT_VERSION.tar.bz2"
-            wget -P "$bzipsdir" -O "$srcfile" "$url"
-        fi
-        if [ ! -s "$srcfile" -a -f "$srcfile" ]; then
-            rm "$srcfile"
-        fi
-
-        if [ ! -f "$srcfile" ]; then
-            echo "Fetching sources from dsp's site failed"
-            echo $url
-            #use Tyrael's RC (5.6.x)
-            url="https://downloads.php.net/tyrael/php-$SHORT_VERSION.tar.bz2"
-            wget -P "$bzipsdir" -O "$srcfile" "$url"
-        fi
-        if [ ! -s "$srcfile" -a -f "$srcfile" ]; then
-            rm "$srcfile"
-        fi
-
-        if [ ! -f "$srcfile" ]; then
-            echo "Fetching sources failed:" >&2
+            echo "ERROR: fetching sources failed:" >&2
             echo $url >&2
             exit 2
         fi
+
+        if [ ! -f "$sigfile" ]; then
+            echo "WARNING: no signature available!" >&2
+        elif [ -z "$gpg" ]; then
+            echo "WARNING: gpg not found; signature will not be verified" >&2
+        else
+            "$gpg" --verify --no-default-keyring --keyring ./php.gpg "$sigfile"
+            if [ $? -ne 0 ]; then
+                echo "ERROR: invalid signature. This release may have been tampered with." >&2
+                echo "ERROR: See http://php.net/gpg-keys.php for more information on GPG signatures." >&2
+                rm -f "$srcfile" "$sigfile"
+                exit 2
+            fi
+        fi
     fi
+
     #extract
     tar xjvf "$srcfile" --show-transformed-names --transform 's#^[^/]*#php-'"$VERSION"'#'
+fi
+
+# See https://bugs.php.net/bug.php?id=64833
+CFLAGS="$CFLAGS -D_GNU_SOURCE"
+
+ARCH=
+PKG_CONFIG=
+if [ $ARCH32 = 1 ]; then
+    ARCH=i386
+    CFLAGS="$CFLAGS -m32"
+    CXXFLAGS="$CXXFLAGS -m32"
+    LDFLAGS="$LDFLAGS -m32"
+    PKG_CONFIG=`which i686-linux-gnu-pkg-config 2> /dev/null`
+    if [ -n "$CC" ]; then
+        CC="$CC -m32"
+    else
+        CC="cc -m32"
+    fi
+    if [ -n "$CXX" ]; then
+        CXX="$CXX -m32"
+    else
+        CXX="c++ -m32"
+    fi
+fi
+export CFLAGS
+export CXXFLAGS
+export LDFLAGS
+export CC
+export CXX
+export ARCH
+if [ -n "$PKG_CONFIG" ]; then
+    export PKG_CONFIG
+else
+    export -n PKG_CONFIG
 fi
 
 #read customizations
@@ -134,22 +194,16 @@ if [ -f "config.nice" -a -f "config.status" ]; then
    tstamp=`stat -c '%Y' "config.status"`
 fi
 
-if [ $ARCH32 = 1 ]; then
-    ARCH=i386
-    CFLAGS="$CFLAGS -m32"
-    CXXFLAGS="$CXXFLAGS -m32"
-    LDFLAGS="$LDFLAGS -m32"
-    export ARCH
-    export CFLAGS
-    export CXXFLAGS
-    export LDFLAGS
-fi
-
 echo "Last config. change:   $configure"
 echo "Last ./configure:      $tstamp"
 if [ $configure -gt $tstamp ]; then
+    echo "Cleaning potential leftover files from previous builds"
+    make distclean 2> /dev/null
+
     #configuring
     echo "(Re-)configuring"
+    configoptions="--with-config-file-path=$instdir/etc/ --with-config-file-scan-dir=$instdir/etc/php.d/ $configoptions"
+
     if [ $DEBUG = 1 ]; then
         configoptions="--enable-debug $configoptions"
         test $VMAJOR -gt 5 -o \( $VMAJOR -eq 5 -a $VMINOR -ge 6 \)
@@ -162,6 +216,9 @@ if [ $configure -gt $tstamp ]; then
     fi
     if [ $GCOV = 1 ]; then
         configoptions="--enable-gcov $configoptions"
+    fi
+    if [ $ARCH32 = 1 ]; then
+        configoptions="--host=i686-pc-linux-gnu $configoptions"
     fi
 
     # --enable-cli first appeared in PHP 5.3.0.
@@ -177,10 +234,19 @@ if [ $configure -gt $tstamp ]; then
         otheroptions="$otheroptions --enable-fpm"
     fi
 
+    # Rebuild missing "./configure" (git snapshots)
+    if [ ! -f "./configure" ]; then
+        if [ $DEBUG -eq 1 ]; then
+            ./buildconf --debug
+        else
+            ./buildconf
+        fi
+    fi
+
     #Disable PEAR installation (handled separately below).
     ./configure $configoptions \
          --prefix="$instdir" \
-         --exec-prefix="$instdir" \
+         --exec-prefix='${prefix}' \
          --without-pear \
          --enable-cgi \
          $otheroptions
@@ -217,6 +283,10 @@ if [ -n "$unknown_options" ]; then
     exit 3
 fi
 
+# Patch "phpize" & "php-config" to use relative paths in "prefix" / "exec_prefix"
+sed -ri -e 's~^((exec_)?prefix)=.*$~\1="$(dirname "$(dirname "$(realpath "$0")")")"~' \
+        "scripts/phpize.in" "scripts/php-config.in"
+
 if [ $configure -gt $tstamp -o ! -f sapi/cli/php ]; then
     #compile sources
     make $MAKE_OPTIONS
@@ -235,6 +305,10 @@ fi
 
 #determine path to extension directory
 ext_dir=`"$instdir/bin/php-config" --extension-dir`
+#make the path relative to the "inst" folder
+rel_ext_dir="${ext_dir/$instbasedir}"
+rel_ext_dir="${rel_ext_dir/\/}"
+rel_ext_dir="${rel_ext_dir/php-$VERSION\/}"
 
 #install PEAR separately
 if [ $PEAR = 1 ]; then
@@ -266,7 +340,6 @@ if [ $PEAR = 1 ]; then
     #proceed with the installation
     sapi/cli/php -n                     \
         -ddisplay_startup_errors=0      \
-        -dauto_prepend_file=../ereg.php \
         -dextension_dir="$pear_ext_dir" \
         $pear_exts                      \
         -dshort_open_tag=0              \
@@ -275,6 +348,9 @@ if [ $PEAR = 1 ]; then
         -derror_reporting=1803          \
         -dmemory_limit=-1               \
         -ddetect_unicode=0              \
+        -dmagic_quotes_gpc=Off          \
+        -dmagic_quotes_runtime=Off      \
+        -dmagic_quotes_sybase=Off       \
         "$pearphar"                     \
             -dp         "a"                         \
             -ds         "-$VERSION"                 \
@@ -295,9 +371,11 @@ if [ $PEAR = 1 ]; then
 
     #add symlink to extension directory as "ext"
     #for compatibility with Pyrus.
-    ln -sfT "$ext_dir" "$instdir/pear/ext"
-    #add a symlink to PEAR's cfg_dir for convenience.
-    ln -sfT "$instdir/pear/cfg" "$instdir/etc/pear"
+    ln -sfT "../$rel_ext_dir" "$instdir/pear/ext"
+    #create PEAR's cfg_dir (not always done automatically)
+    mkdir -p "$instdir/pear/cfg"
+    #add symlink to PEAR's cfg_dir for convenience.
+    ln -sfT "../pear/cfg" "$instdir/etc/pear"
 fi
 
 #copy php.ini
@@ -305,7 +383,7 @@ fi
 if [ "x$initarget" = x ]; then
     initarget="$instdir/etc/php.ini"
 fi
-mkdir -p `dirname "$initarget"`
+mkdir -p `dirname "$initarget"`/php.d
 if [ -f "php.ini-development" ]; then
     #php 5.3
     cp "php.ini-development" "$initarget"
@@ -337,15 +415,30 @@ if [ ! -d "$shbindir" ]; then
     echo "Cannot create shared bin dir" >&2
     exit 6
 fi
-#symlink all files
 
+#symlink the binary files
 #php may be called php.gcno
 #same for php-cgi.
-for binary in php php-cgi php-config phpize; do
+for binary in php php-cgi phpize; do
     if [ -f "$instdir/bin/$binary" ]; then
-        ln -fs "$instdir/bin/$binary" "$shbindir/$binary-$VERSION"
+        ln -fsT "../php-$VERSION/bin/$binary" "$shbindir/$binary-$VERSION"
     elif [ -f "$instdir/bin/$binary.gcno" ]; then
-        ln -fs "$instdir/bin/$binary.gcno" "$shbindir/$binary-$VERSION"
+        ln -fsT "../php-$VERSION/bin/$binary.gcno" "$shbindir/$binary-$VERSION"
+    else
+        echo "no $binary found" >&2
+        exit 7
+    fi
+done
+
+for binary in php-config; do
+    if [ -f "$instdir/bin/$binary" ]; then
+        ln -fsT "../php-$VERSION/bin/$binary" "$shbindir/$binary-$VERSION"
+        orig_prefix=`"$instdir/bin/$binary" --prefix`
+        orig_extdir=`"$instdir/bin/$binary" --extension-dir`
+        # Use dynamic paths for "extension_dir" and "configure_options"
+        sed -ri -e 's~^extension_dir=.*$~extension_dir="${prefix}'"${orig_extdir#$orig_prefix}"'"~' \
+                -e "/^configure_options=/s~$instdir~"'${prefix}~g' \
+                "$instdir/bin/$binary"
     else
         echo "no $binary found" >&2
         exit 7
@@ -355,9 +448,9 @@ done
 #other optional SAPIs.
 for binary in php-fpm phpdbg; do
     if [ -f "$instdir/bin/$binary" ]; then
-        ln -fs "$instdir/bin/$binary" "$shbindir/$binary-$VERSION"
+        ln -fsT "../php-$VERSION/bin/$binary" "$shbindir/$binary-$VERSION"
     elif [ -f "$instdir/sbin/$binary" ]; then
-        ln -fs "$instdir/sbin/$binary" "$shbindir/$binary-$VERSION"
+        ln -fsT "../php-$VERSION/sbin/$binary" "$shbindir/$binary-$VERSION"
     fi
 done
 
@@ -376,9 +469,14 @@ fi
 # Let's be user-friendly and add symlinks to all these tools.
 for binary in pear peardev pecl phar; do
     if [ -e "$instdir/bin/$binary" ]; then
-        ln -fs "$instdir/bin/$binary" "$shbindir/$binary-$VERSION"
+        ln -fsT "../php-$VERSION/bin/$binary" "$shbindir/$binary-$VERSION"
     fi
 done
+
+#replace absolute link to phar.phar with a relative one
+if [ -e "$instdir/bin/phar" ]; then
+    ln -fsT "phar.phar" "$instdir/bin/phar"
+fi
 
 # Export various variables for use
 # in post-install scripts and such.
@@ -388,6 +486,7 @@ export VMINOR
 export VPATCH
 export SHORT_VERSION
 export ARCH
+export PEAR
 
 cd "$basedir"
 ./pyrus.sh "$VERSION" "$instdir"
