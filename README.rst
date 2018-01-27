@@ -29,7 +29,7 @@ Setup
 
 You should consider adding ``inst/bin``, ``inst/current/bin`` and
 ``inst/current/sbin`` to your ``$PATH``, i.e. append
-``PATH="$PATH:$HOME/phpfarm/inst/bin:$HOME/phpfarm/inst/current/bin:$HOME/phpfarm/inst/current/sbin"``
+``PATH="$HOME/phpfarm/inst/bin:$HOME/phpfarm/inst/current/bin:$HOME/phpfarm/inst/current/sbin:$PATH"``
 to your ``.bashrc`` or similar file.
 
 
