@@ -23,7 +23,7 @@ fi
 version="$1"
 phpdir="php-$version"
 
-if [ $version != $php_system ]; then
+if [ $version != "$php_system" ]; then
     if [ ! -d "$basedir/$phpdir" ]; then
        echo "PHP version $version is not installed"
        exit 2
@@ -33,7 +33,7 @@ if [ $version != $php_system ]; then
        $basedir/current/bin/php --version
     fi
 else 
-   echo Setting active PHP version to system version ($version)
-   rm $binlink
+   echo "Setting active PHP version to system version ($version)"
+   rm -f "$binlink"
    php --version
 fi 
