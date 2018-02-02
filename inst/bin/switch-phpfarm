@@ -1,13 +1,21 @@
 #!/bin/sh
-basedir="`dirname "$0"`/../"
-cd "$basedir"
-basedir=`pwd`
+basedir="$(dirname "$0")/../"
+cd "$basedir" || exit
+basedir="$(pwd)"
 binlink="$basedir/current"
-active=`basename $(readlink "$binlink") 2>/dev/null | sed -e 's/^php-//;s/\./\\\\./g'`
+active=`basename "$(readlink "$binlink")" 2>/dev/null | sed -e 's/^php-//;s/\./\\\\./g'`
+
+php_system=""
+if [ -f "/usr/bin/php" ]; then
+    php_system=$(/usr/bin/php -v|grep --only-matching --perl-regexp "\d\.\\d+\.\\d+"|head -1)
+fi
 
 if [ "$1" = "" ]; then
     echo Switch the currently active PHP version of phpfarm
     echo Available versions:
+    if [ "$php_system" != "" ]; then
+        echo "$php_system (default system version)" | sed -e 's/^/  /' -e "s/^  \($active .*\)\$/* \1/"
+    fi
     find . -maxdepth 1 -type d -name 'php-*' -printf '%f\n' | sort -V | sed -e 's/^php-//' -e 's/^/  /' -e "s/^  \($active\)\$/* \1/"
     exit 1
 fi
@@ -15,11 +23,17 @@ fi
 version="$1"
 phpdir="php-$version"
 
-if [ ! -d "$basedir/$phpdir" ]; then
-    echo "PHP version $version is not installed"
-    exit 2
+if [ "$version" != "$php_system" ]; then
+    if [ ! -d "$basedir/$phpdir" ]; then
+       echo "PHP version $version is not installed"
+       exit 2
+    else
+       echo "Setting active PHP version to $version"
+       ln -sfT "$phpdir" "$binlink"
+       "$basedir/current/bin/php" --version
+    fi
+else
+   echo "Setting active PHP version to system version ($version)"
+   rm -f "$binlink"
+   php --version
 fi
-
-echo Setting active PHP version to $version
-ln -sfT "$phpdir" "$binlink"
-$basedir/current/bin/php --version
