@@ -153,13 +153,11 @@ fi
 CFLAGS="$CFLAGS -D_GNU_SOURCE"
 
 ARCH=
-PKG_CONFIG=
 if [ $ARCH32 = 1 ]; then
     ARCH=i386
     CFLAGS="$CFLAGS -m32"
     CXXFLAGS="$CXXFLAGS -m32"
     LDFLAGS="$LDFLAGS -m32"
-    PKG_CONFIG=`which i686-linux-gnu-pkg-config 2> /dev/null`
     if [ -n "$CC" ]; then
         CC="$CC -m32"
     else
@@ -177,11 +175,6 @@ export LDFLAGS
 export CC
 export CXX
 export ARCH
-if [ -n "$PKG_CONFIG" ]; then
-    export PKG_CONFIG
-else
-    export -n PKG_CONFIG
-fi
 
 #read customizations
 source 'options.sh' "$VERSION" "$VMAJOR" "$VMINOR" "$VPATCH"
