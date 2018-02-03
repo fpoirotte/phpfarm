@@ -26,13 +26,13 @@
 #
 
 #directory of this file. all php sources are extracted in it
-basedir="`dirname "$0"`"
-cd "$basedir"
-basedir=`pwd`
+basedir="$(dirname "$0")"
+cd "$basedir" || exit
+basedir="$(pwd)"
 
 #we need a php version
 source helpers.sh
-parse_version $1
+parse_version "$1"
 if [ $? -ne 0 ]; then
     echo 'Please specify a valid php version' >&2
     exit 1
@@ -43,7 +43,7 @@ srcdir="php-$VERSION"
 #directory with source archives
 bzipsdir='bzips'
 #directory phps get installed into
-instbasedir="`readlink -f "$basedir/../inst"`"
+instbasedir="$(readlink -f "$basedir/../inst")"
 #directory this specific version gets installed into
 instdir="$instbasedir/php-$VERSION"
 #directory where all bins are symlinked
@@ -52,13 +52,13 @@ shbindir="$instbasedir/bin"
 #handle git snapshots
 if [ "$VMAJOR.$VMINOR" = "0.0" ]; then
     #download the snapshot and store STDERR
-    tmp=`mktemp`
+    tmp="$(mktemp)"
     trap "rm -f '$tmp'" EXIT
     url="https://git.php.net/?p=php-src.git;a=snapshot;h=$VPATCH;sf=tgz"
     LC_ALL=C LANG=C LANGUAGE=C wget --no-host-directories -P "$bzipsdir" -nc \
                                     --content-disposition "$url"  2>> "$tmp"
     #retrieve snapshot name
-    srcfile=`cat "$tmp" | grep -P '(^Saving to|already there; not retrieving\.$)' | cut -d"'" -f2`
+    srcfile="$(grep -P '(^Saving to|already there; not retrieving\.$)' < "$tmp" | cut -d"'" -f2)"
 
     #display original STDERR then clean up
     cat "$tmp" >&2
@@ -67,7 +67,7 @@ if [ "$VMAJOR.$VMINOR" = "0.0" ]; then
 
     if [ ! -f "$srcfile" ]; then
         echo "Fetching sources failed:" >&2
-        echo $url >&2
+        echo "$url" >&2
         exit 2
     fi
 
@@ -94,17 +94,17 @@ if [ ! -d "$srcdir" ]; then
     sigfile="$bzipsdir/php-$SHORT_VERSION.tar.bz2.asc"
     if [ ! -f "$srcfile" ]; then
         # Check for GPG existence.
-        gpg=`which gpg`
+        gpg="$(which gpg)"
         if [ $? -ne 0 ]; then
             gpg=
         fi
 
         echo "Source file not found ($srcfile). Downloading now..."
         for url in "${sources[@]}"; do
-            echo $url
+            echo "$url"
             wget -P "$bzipsdir" -O "$srcfile" "$url"
 
-            if [ ! -s "$srcfile" -a -f "$srcfile" ]; then
+            if [ ! -s "$srcfile" ] && [ -f "$srcfile" ]; then
                 rm -f "$srcfile"
             fi
 
@@ -114,7 +114,7 @@ if [ ! -d "$srcdir" ]; then
                 echo "Downloading the signature..."
                 wget -P "$bzipsdir" -O "$sigfile" "${url/.tar.bz2/.tar.bz2.asc}"
 
-                if [ ! -s "$sigfile" -a -f "$sigfile" ]; then
+                if [ ! -s "$sigfile" ] && [ -f "$sigfile" ]; then
                     rm -f "$sigfile"
                 fi
             fi
@@ -126,7 +126,7 @@ if [ ! -d "$srcdir" ]; then
 
         if [ ! -f "$srcfile" ]; then
             echo "ERROR: fetching sources failed:" >&2
-            echo $url >&2
+            echo "$url" >&2
             exit 2
         fi
 
@@ -178,18 +178,18 @@ export ARCH
 
 #read customizations
 source 'options.sh' "$VERSION" "$VMAJOR" "$VMINOR" "$VPATCH"
-cd "$srcdir"
+cd "$srcdir" || exit
 
 #only configure/make during the first install of a new version
 #or after some change occurred in customizations.
 tstamp=0
-if [ -f "config.nice" -a -f "config.status" ]; then
-   tstamp=`stat -c '%Y' "config.status"`
+if [ -f "config.nice" ] && [ -f "config.status" ]; then
+   tstamp="$(stat -c '%Y' "config.status")"
 fi
 
 echo "Last config. change:   $configure"
 echo "Last ./configure:      $tstamp"
-if [ $configure -gt $tstamp ]; then
+if [ "$configure" -gt "$tstamp" ]; then
     echo "Cleaning potential leftover files from previous builds"
     make distclean 2> /dev/null
 
@@ -197,39 +197,39 @@ if [ $configure -gt $tstamp ]; then
     echo "(Re-)configuring"
     configoptions="--with-config-file-path=$instdir/etc/ --with-config-file-scan-dir=$instdir/etc/php.d/ $configoptions"
 
-    if [ $DEBUG = 1 ]; then
+    if [ "$DEBUG" = 1 ]; then
         configoptions="--enable-debug $configoptions"
-        test $VMAJOR -gt 5 -o \( $VMAJOR -eq 5 -a $VMINOR -ge 6 \)
+        test "$VMAJOR" -gt 5 -o \( "$VMAJOR" -eq 5 -a "$VMINOR" -ge 6 \)
         if [[ $? -eq 0 && $configoptions == *--enable-phpdbg* ]]; then
             configoptions="--enable-phpdbg-debug $configoptions"
         fi
     fi
-    if [ $ZTS = 1 ]; then
+    if [ "$ZTS" = 1 ]; then
         configoptions="--enable-maintainer-zts $configoptions"
     fi
-    if [ $GCOV = 1 ]; then
+    if [ "$GCOV" = 1 ]; then
         configoptions="--enable-gcov $configoptions"
     fi
-    if [ $ARCH32 = 1 ]; then
+    if [ "$ARCH32" = 1 ]; then
         configoptions="--host=i686-pc-linux-gnu $configoptions"
     fi
 
     # --enable-cli first appeared in PHP 5.3.0.
     otheroptions=
-    if [ $VMAJOR -gt 5 -o $VMINOR -ge 3 ]; then
+    if [ "$VMAJOR" -gt 5 ] || [ "$VMINOR" -ge 3 ]; then
         otheroptions="$otheroptions --enable-cli"
     fi
 
     # For PHP 5.4.0+, also build php-fpm.
     # In PHP 5.3.0, only one SAPI can be built at a time
     # (and we already build php-cgi, hence a conflict).
-    if [ $VMAJOR -gt 5 -o $VMINOR -ge 4 ]; then
+    if [ "$VMAJOR" -gt 5 ] || [ "$VMINOR" -ge 4 ]; then
         otheroptions="$otheroptions --enable-fpm"
     fi
 
     # Rebuild missing "./configure" (git snapshots)
     if [ ! -f "./configure" ]; then
-        if [ $DEBUG -eq 1 ]; then
+        if [ "$DEBUG" -eq 1 ]; then
             ./buildconf --debug
         else
             ./buildconf
@@ -255,20 +255,20 @@ fi
 # Check that no unknown options have been used.
 unknown_options=
 if [ -e "config.status" ]; then
-    unknown_options=`sed -ne '/Following unknown configure options were used/,/for available options/p' config.status | sed -n -e '$d' -e '/^$/d' -e '3,$p'`
+    unknown_options="$(sed -ne '/Following unknown configure options were used/,/for available options/p' config.status | sed -n -e '$d' -e '/^$/d' -e '3,$p')"
 fi
 # PHP 5.4+ uses a different way to report such problems.
-if [ -z "$unknown_options" -a -e "config.log" ]; then
-    unknown_options=`sed -n -r -e 's/configure:[^\020]+WARNING: unrecognized options: //p' config.log`
+if [ -z "$unknown_options" ] && [ -e "config.log" ]; then
+    unknown_options="$(sed -n -r -e 's/configure:[^\020]+WARNING: unrecognized options: //p' config.log)"
 fi
 
 if [ -n "$unknown_options" ]; then
     # If the error comes from a previous run, ./configure won't kick in and
     # it won't display the error message. We do the work in its place here.
-    if [ $configure -le $tstamp ]; then
+    if [ "$configure" -le "$tstamp" ]; then
         echo "ERROR: The following unrecognized configure options were used:" >&2
         echo "" >&2
-        echo $unknown_options >&2
+        echo "$unknown_options" >&2
         echo "" >&2
         echo "Check 'configure --help' for available options." >&2
     fi
@@ -280,7 +280,7 @@ fi
 sed -ri -e 's~^((exec_)?prefix)=.*$~\1="$(dirname "$(dirname "$(realpath "$0")")")"~' \
         "scripts/phpize.in" "scripts/php-config.in"
 
-if [ $configure -gt $tstamp -o ! -f sapi/cli/php ]; then
+if [ "$configure" -gt "$tstamp" ] || [ ! -f sapi/cli/php ]; then
     #compile sources
     make $MAKE_OPTIONS
     if [ "$?" -gt 0 ]; then
@@ -297,7 +297,7 @@ if [ "$?" -gt 0 ]; then
 fi
 
 #determine path to extension directory
-ext_dir=`"$instdir/bin/php-config" --extension-dir`
+ext_dir="$("$instdir/bin/php-config" --extension-dir)"
 #make the path relative to the "inst" folder
 rel_ext_dir="${ext_dir/$instbasedir}"
 rel_ext_dir="${rel_ext_dir/\/}"
@@ -320,7 +320,7 @@ if [ $PEAR = 1 ]; then
     mkdir -p "$instdir/pear/php"
 
     #use local modules
-    pear_ext_dir="`pwd`/modules"
+    pear_ext_dir="$(pwd)/modules"
 
     #take care of static vs. dynamic modules
     pear_exts=""
@@ -376,7 +376,7 @@ fi
 if [ "x$initarget" = x ]; then
     initarget="$instdir/etc/php.ini"
 fi
-mkdir -p `dirname "$initarget"`/php.d
+mkdir -p "$(dirname "$initarget")/php.d"
 if [ -f "php.ini-development" ]; then
     #php 5.3
     cp "php.ini-development" "$initarget"
@@ -389,7 +389,7 @@ else
 fi
 
 #set default ini values
-cd "$basedir"
+cd "$basedir" || exit
 if [ -f "$initarget" ]; then
     #fixme: make the options unique or so
     custom="custom/php.ini"
@@ -426,8 +426,8 @@ done
 for binary in php-config; do
     if [ -f "$instdir/bin/$binary" ]; then
         ln -fsT "../php-$VERSION/bin/$binary" "$shbindir/$binary-$VERSION"
-        orig_prefix=`"$instdir/bin/$binary" --prefix`
-        orig_extdir=`"$instdir/bin/$binary" --extension-dir`
+        orig_prefix="$("$instdir/bin/$binary" --prefix)"
+        orig_extdir="$("$instdir/bin/$binary" --extension-dir)"
         # Use dynamic paths for "extension_dir" and "configure_options"
         sed -ri -e 's~^extension_dir=.*$~extension_dir="${prefix}'"${orig_extdir#$orig_prefix}"'"~' \
                 -e "/^configure_options=/s~$instdir~"'${prefix}~g' \
@@ -481,7 +481,7 @@ export SHORT_VERSION
 export ARCH
 export PEAR
 
-cd "$basedir"
+cd "$basedir" || exit
 ./pyrus.sh "$VERSION" "$instdir"
 
 # Post-install stuff

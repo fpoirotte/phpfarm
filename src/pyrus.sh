@@ -9,9 +9,9 @@ if [ $# -lt 2 ] ; then
 fi
 
 version="$1"
-vmajor=`echo ${version%%.*}`
-vminor=`echo ${version%.*}`
-vminor=`echo ${vminor#*.}`
+vmajor="${version%%.*}"
+vminor="${version%.*}"
+vminor="${vminor#*.}"
 instdir="$2"
 
 if [ ! -d "$instdir" ]; then
@@ -19,16 +19,16 @@ if [ ! -d "$instdir" ]; then
     exit 1
 fi
 
-test $vmajor -gt 5 -o \( $vmajor -eq 5 -a $vminor -ge 3 \)
+test "$vmajor" -gt 5 -o \( "$vmajor" -eq 5 -a "$vminor" -ge 3 \)
 if [ $? -ne 0 ]; then
     echo "Skipping Pyrus installation for PHP < 5.3.0"
     exit 0
 fi
 
-pwd=`pwd`
-cd "`dirname "$0"`"
-basedir=`pwd`
-cd "$pwd"
+pwd="$(pwd)"
+cd "$(dirname "$0")" || exit
+basedir="$(pwd)"
+cd "$pwd" || exit
 
 pyrusphar="$basedir/bzips/pyrus.phar"
 pyrustarget="$instdir/pyrus.phar"

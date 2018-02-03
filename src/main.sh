@@ -25,9 +25,9 @@
 # Author: François Poirotte <clicky@erebot.net>
 #
 
-basedir="`dirname "$0"`"
-cd "$basedir"
-basedir=`pwd`
+basedir="$(dirname "$0")"
+cd "$basedir"|| exit
+basedir="$(pwd)"
 source helpers.sh
 
 versions=()
@@ -40,9 +40,9 @@ done
 if [ $# -eq 0 ]; then
     default_versions="$basedir/custom/default-versions.txt"
     if [ -e "$default_versions" ]; then
-        while read arg; do
+        while read -r arg; do
             # Ignore comments and strip leading/trailing whitespace.
-            arg=`printf "%s\n" "$arg" | sed -e 's/#.*$//;s/\s+$//;s/^\s+//'`
+            arg="$(printf "%s\n" "$arg" | sed -e 's/#.*$//;s/\s+$//;s/^\s+//')"
             if [ "x$arg" != "x" ]; then
                 versions[${#versions[@]}]="$arg"
             fi
@@ -68,7 +68,7 @@ done
 # but only if we were run without any arguments.
 if [ $# -eq 0 ]; then
     instbasedir="$basedir/../inst/"
-    for inst_version in `ls -1p "$instbasedir" | grep ^php-.*/$`; do
+    for inst_version in $(ls -1p "$instbasedir" | grep '^php-.*/$'); do
         # Remove "php-" prefix and "/" suffix.
         inst_version=${inst_version:4:-1}
 
@@ -83,15 +83,15 @@ if [ $# -eq 0 ]; then
 
         if [ $found -eq 0 ]; then
             echo -n "Remove obsolete version $inst_version? [Y/n] "
-            read remove
-            if [ -z "$remove" -o "$remove" = "y" -o "$remove" = "Y" ]; then
+            read -r remove
+            if [ -z "$remove" ] || [ "$remove" = "y" ] || [ "$remove" = "Y" ]; then
                 rm -vfr "$instbasedir/php-$inst_version"
             fi
 
             if [ -e "$basedir/php-$inst_version" ]; then
                 echo -n "Remove compilation directory $basedir/php-$inst_version? [Y/n] "
-                read remove
-                if [ -z "$remove" -o "$remove" = "y" -o "$remove" = "Y" ]; then
+                read -r remove
+                if [ -z "$remove" ] || [ "$remove" = "y" ] || [ "$remove" = "Y" ]; then
                     rm -vfr "$basedir/php-$inst_version"
                 fi
             fi

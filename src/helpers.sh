@@ -22,18 +22,24 @@ parse_version() {
     # $VERSION: full version string, normalized.
     #           Eg. "5.4.0RC1-debug-zts-32bits-gcov"
     #           when all possible tokens are used.
-    v=`echo "$1" | sed -e 's/[-.]/ /g'`
+    local p v
+    declare -g VMAJOR VMINOR VPATCH
+    declare -g ARCH32 DEBUG GCOV PEAR ZTS
+    declare -g VERSION SHORT_VERSION
+
+    v="$1"
+    v="${v//[-.]/ }"
 
     # empty version string or contained only '.' or '-'.
-    if [ -z `echo "$v" | sed -e 's/ //g'` ]; then
+    if [ -z "${v// /}" ]; then
         return 1
     fi
 
     # basic information
-    VMAJOR=`echo "$v" | cut -d ' ' -f 1`
-    VMINOR=`echo "$v" | cut -d ' ' -f 2`
-    VPATCH=`echo "$v" | cut -d ' ' -f 3`
-    v=`echo "$v" | cut -d ' ' -f 4-`
+    VMAJOR="$(echo "$v" | cut -d ' ' -f 1)"
+    VMINOR="$(echo "$v" | cut -d ' ' -f 2)"
+    VPATCH="$(echo "$v" | cut -d ' ' -f 3)"
+    v="$(echo "$v" | cut -d ' ' -f 4-)"
 
     # extract tokens & set flags accordingly
     ARCH32=0
@@ -68,6 +74,9 @@ parse_version() {
     if [ $ZTS = 1 ]; then
         VERSION="$VERSION-zts"
     fi
+
+    export ARCH32 DEBUG GCOV PEAR ZTS
+    export VMINOR VMAJOR VPATCH VERSION SHORT_VERSION
 
     return 0
 }

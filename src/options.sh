@@ -33,7 +33,7 @@ configoptions="\
 "
 
 # --enable-sqlite-utf8 was removed starting with PHP 5.4.0.
-test $vmajor -eq 5 -a $vminor -lt 4
+test "$vmajor" -eq 5 -a "$vminor" -lt 4
 if [ $? -eq 0 ]; then
 configoptions="\
 $configoptions \
@@ -41,16 +41,16 @@ $configoptions \
 "
 fi
 
-echo $version $vmajor $vminor $vpatch
+echo "$version $vmajor $vminor $vpatch"
 
-configure=`stat -c '%Y' "options.sh"`
+configure="$(stat -c '%Y' "options.sh")"
 for suffix in "" "-$vmajor" "-$vmajor.$vminor" "-$vmajor.$vminor.$vpatch" "-$version"; do
     custom="custom/options$suffix.sh"
     printf "Parsing '%s' ...\n" "$custom"
     if [ -e "$custom" ]; then
-        tstamp=`stat -c '%Y' "$custom"`
-        if [ $tstamp -gt $configure ]; then
-            configure=$tstamp
+        tstamp="$(stat -c '%Y' "$custom")"
+        if [ "$tstamp" -gt "$configure" ]; then
+            configure="$tstamp"
         fi
         source "$custom" "$version" "$vmajor" "$vminor" "$vpatch"
     fi
