@@ -94,8 +94,10 @@ To use it, first make sure that ``inst/bin`` is in your ``$PATH``
 Then, for Bash: simply copy ``src/phpfarm.autocomplete`` to ``/etc/bash_completion.d/phpfarm`` as root.
 
 For ZSH:
+
 - Copy ``src/phpfarm.autocomplete`` to ``/usr/local/share/zsh/site-functions/_phpfarm``
   or another directory in your configuration's ``fpath`` as root
+
 - Add this line to ``~/.zshrc`` right after the call to ``compinit``:
   ``compdef _phpfarm switch-phpfarm``
 
