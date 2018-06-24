@@ -86,6 +86,18 @@ PHP versions the default one that gets run when just typing ``php``::
       5.3.16
     * 5.4.6
 
+We also provide a completion script compatible with both Bash & ZSH
+to make ``switch-phpfarm`` auto-complete its arguments.
+To use it, first make sure that ``inst/bin`` is in your ``$PATH``
+(see `Setup`_ for more information on how to configure your ``$PATH``.)
+
+Then, for Bash: simply copy ``src/phpfarm.autocomplete`` to ``/etc/bash_completion.d/phpfarm`` as root.
+
+For ZSH:
+- Copy ``src/phpfarm.autocomplete`` to ``/usr/local/share/zsh/site-functions/_phpfarm``
+  or another directory in your configuration's ``fpath`` as root
+- Add this line to ``~/.zshrc`` right after the call to ``compinit``:
+  ``compdef _phpfarm switch-phpfarm``
 
 php.ini customization
 ---------------------

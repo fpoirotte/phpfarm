@@ -1,0 +1,26 @@
+#compdef _phpfarm switch-phpfarm
+# The line above is used by ZSH, do not remove it!
+
+# Autocompletion function for phpfarm
+_phpfarm()
+{
+    local versions
+    versions="$( switch-phpfarm | tr '*' ' ' | tr -s ' ' | grep '^ ' | cut -d' ' -f2 )"
+
+    # Bash only: fill in COMPREPLY with completion candidates
+    if type -f complete &> /dev/null; then
+        local cur
+        cur="${COMP_WORDS[COMP_CWORD]}"
+        COMPREPLY=( $( compgen -W "${versions}" -- "${cur}" ) )
+    fi
+
+    # ZSH only: describe the arguments using _arguments
+    if type -f _arguments &> /dev/null; then
+        _arguments -C "1: :($versions)"
+    fi
+}
+
+# Bash only: associate the completion function with switch-phpfarm
+if type -f complete &> /dev/null; then
+    complete -F _phpfarm switch-phpfarm
+fi
