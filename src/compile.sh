@@ -485,6 +485,68 @@ export PEAR
 cd "$basedir" || exit
 ./pyrus.sh "$VERSION" "$instdir"
 
+function install_pecl () {
+    local tmpdir
+    local pkg
+    local ext
+    local zend
+
+    pkg="$1"
+    zend=""
+
+    echo -n "Trying to install '$pkg' ... "
+
+    if [[ "$pkg" =~ ^(http|ftp)s?:// ]]; then
+        echo ""
+        tmpdir=`mktemp -d`
+        mkdir "$tmpdir/src"
+
+        # If given an URL, download the code using wget.
+        wget -nv -P "$tmpdir" -O "archive" "$pkg"
+
+        # Uncompress the archive, assuming that the archive follows best-practices.
+        # Thus, the files are located in a subfolder (which we strip during extraction).
+        tar -xaf "$tmpdir/archive" -C "$tmpdir/src" --transform 's#^[^/]*##'
+
+        if [ -f "$tmpdir/src/config.m4" ]; then
+            pushd "$tmpdir"
+
+            "$instdir/bin/phpize"
+            ext=`sed -n '/^\s\+PHP_PECL_EXTENSION=/{s/.*=//;p}' configure`
+            if [ -n "$ext" ]; then
+                "$tmpdir/src/configure" --with-php-config="$2/bin/php-config"
+                zend=`sed -n '/^PHP_ZEND_EX *= */{s/.*= *//;p}' Makefile`
+                make
+                make install
+            fi
+
+            popd
+        fi
+
+        rm -rf "$tmpdir"
+    else
+        # Make sure the "pecl/" prefix is present.
+        pkg="pecl/${pkg#pecl/}"
+        ext="${pkg#pecl/}"
+        ext="${pkg%-*}"
+
+        # This is probably a package hosted on pecl.php.net,
+        # we try to install it using the pear installer.
+        pushd "$tmpdir"
+        ( "$instdir/bin/pear" info "$pkg" &> /dev/null && echo "already installed" ) || \
+        ( "$instdir/bin/pear" install -os "$pkg" < /dev/null && echo "OK" )
+        popd
+    fi
+
+    if [ -z "$zend" ]; then
+        echo "extension=${ext}.so" > "$instdir/etc/php.d/50-${ext}.ini"
+    else
+        echo "zend_extension=${ext_dir}/${ext}.so" > "$instdir/etc/php.d/30-${ext}.ini"
+    fi
+}
+
+export -f install_pecl
+
 # Post-install stuff
 for suffix in "" "-$VMAJOR" "-$VMAJOR.$VMINOR" "-$SHORT_VERSION" "-$VERSION"; do
     post="custom/post-install$suffix.sh"
