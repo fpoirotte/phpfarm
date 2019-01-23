@@ -310,7 +310,7 @@ if [ $PEAR = 1 ]; then
     if [ ! -e "$pearphar" ]; then
         #download PEAR installer
         wget -O "$pearphar" \
-            "https://pear.php.net/install-pear-nozlib.phar"
+            "https://github.com/pear/pearweb_phars/raw/master/install-pear-nozlib.phar"
     fi
     if [ ! -e "$pearphar" ]; then
         echo "Please put install-pear-nozlib.phar into bzips/"
