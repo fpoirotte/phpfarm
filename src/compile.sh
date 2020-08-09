@@ -485,7 +485,10 @@ export ARCH
 export PEAR
 
 cd "$basedir" || exit
-./pyrus.sh "$VERSION" "$instdir"
+
+# Pyrus is no longer maintained.
+# See #27 for more information.
+#./pyrus.sh "$VERSION" "$instdir"
 
 function install_pecl () {
     local tmpdir
