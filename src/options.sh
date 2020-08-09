@@ -24,12 +24,7 @@ configoptions="\
 --enable-ftp \
 --enable-mbstring \
 --enable-pcntl \
---enable-soap \
 --enable-sockets \
---enable-wddx \
---enable-zip \
---with-zlib \
---with-gettext \
 "
 
 # --enable-sqlite-utf8 was removed starting with PHP 5.4.0.
