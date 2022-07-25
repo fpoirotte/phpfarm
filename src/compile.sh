@@ -88,6 +88,10 @@ sources=(
     "https://downloads.php.net/~cmb/php-$SHORT_VERSION.tar.bz2"
     "https://downloads.php.net/~derick/php-$SHORT_VERSION.tar.bz2"
     "https://downloads.php.net/~carusogabriel/php-$SHORT_VERSION.tar.bz2"
+    "https://downloads.php.net/~patrickallaert/php-$SHORT_VERSION.tar.bz2"
+    "https://downloads.php.net/~ramsey/php-$SHORT_VERSION.tar.bz2"
+    "https://downloads.php.net/~sergey/php-$SHORT_VERSION.tar.bz2"
+    "https://downloads.php.net/~pierrick/php-$SHORT_VERSION.tar.bz2"
 )
 
 #already extracted?
