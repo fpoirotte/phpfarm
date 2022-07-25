@@ -1,6 +1,14 @@
 phpfarm
 =======
 
+**WARNING:** as of 2021, PHPFarm is not actively maintained anymore.
+Existing users should transition to alternative solutions instead:
+
+* Debian Linux provides co-installable packages (`php7.4`, `php8.1`, `php8.2`, etc.)
+* Fedora Linux / Enterprise Linux users may refer to Remi Collet's repository (https://rpms.remirepo.net/wizard/)
+* etc.
+
+
 phpfarm is a set of scripts to install a dozen of PHP versions in parallel
 on a single system. It also installs the pear and pyrus installers and
 creates a local Pyrus installation for each PHP version as well.
